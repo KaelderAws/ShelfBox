@@ -31,10 +31,47 @@ function getCoversDir() {
   }
 }
 
-const coversDir = getCoversDir();
-const userDataPath = app.getPath('userData');
+// Определение и создание пути к базе данных в корне проекта
+function getDatabasePath() {
+  const targetDbPath = path.join(appRootDir, 'catalog.db');
 
-const db = new Database(path.join(userDataPath, 'catalog.db'));
+  try {
+    // Проверка прав на запись в корень программы
+    const testFile = path.join(appRootDir, '.perm_test_db');
+    fs.writeFileSync(testFile, '');
+    fs.unlinkSync(testFile);
+
+    // Список возможных мест хранения старой базы для автоматического переноса
+    const candidateDbPaths = [
+      path.join(app.getPath('userData'), 'catalog.db'),
+      path.join(app.getPath('appData'), 'catalog', 'catalog.db'),
+      path.join(app.getPath('appData'), 'Game Shelf', 'catalog.db')
+    ];
+
+    const rootStat = fs.existsSync(targetDbPath) ? fs.statSync(targetDbPath) : null;
+
+    for (const oldPath of candidateDbPaths) {
+      if (fs.existsSync(oldPath) && path.resolve(oldPath) !== path.resolve(targetDbPath)) {
+        const oldStat = fs.statSync(oldPath);
+        if (!rootStat || rootStat.size < oldStat.size) {
+          console.log(`Перенос существующей базы данных из ${oldPath} в корень программы...`);
+          fs.copyFileSync(oldPath, targetDbPath);
+          break;
+        }
+      }
+    }
+
+    return targetDbPath;
+  } catch (e) {
+    console.warn('Нет прав на запись в корень программы, используем userData:', e);
+    return path.join(app.getPath('userData'), 'catalog.db');
+  }
+}
+
+const coversDir = getCoversDir();
+const dbPath = getDatabasePath();
+
+const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
 db.pragma('synchronous = NORMAL');
 

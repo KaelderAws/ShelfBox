@@ -10,7 +10,7 @@
   "keywords": [],
   "author": "YourName",
   "license": "ISC",
-  "description": "Game Catalog",
+  "description": "ShelfBox",
   "dependencies": {
     "better-sqlite3": "^13.0.3"
   },
