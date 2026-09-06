@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>ShelfBox</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Сайдбар -->
+  <aside class="sidebar">
+    <div class="brand">
+      <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M4 6h16M4 12h16M4 18h7"/>
+      </svg>
+      <span class="brand-text">ShelfBox</span>
+    </div>
+
+    <button id="open-add-modal-btn" class="primary-btn add-btn">
+      <span>Добавить медиа</span>
+    </button>
+
+    <div class="nav-group">
+      <div class="nav-header">Разделы</div>
+      <button class="nav-item active" id="tab-catalog-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span>Каталог</span>
+      </button>
+      <button class="nav-item" id="tab-tags-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        <span>Теги</span>
+      </button>
+    </div>
+
+    <div class="nav-group" id="media-types-filter">
+      <div class="nav-header">Тип медиа</div>
+      <button class="nav-item active" data-type="all">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span>Все</span>
+      </button>
+      <button class="nav-item" data-type="game">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4m-2-2v4m7-2h.01m3 0h.01"/></svg>
+        <span>Игры</span>
+      </button>
+      <button class="nav-item" data-type="movie">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
+        <span>Фильмы</span>
+      </button>
+      <button class="nav-item" data-type="series">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+        <span>Сериалы</span>
+      </button>
+      <button class="nav-item" data-type="book">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        <span>Книги</span>
+      </button>
+      <button class="nav-item" data-type="anime">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>
+        <span>Аниме</span>
+      </button>
+      <button class="nav-item" data-type="boardgame">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><circle cx="15.5" cy="8.5" r="1.5"/><circle cx="15.5" cy="15.5" r="1.5"/><circle cx="8.5" cy="15.5" r="1.5"/></svg>
+        <span>Настолки</span>
+      </button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-header">Быстрый доступ</div>
+      <button class="nav-item" id="filter-favorites">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        <span>Избранное</span>
+      </button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-title-row">
+        <span class="nav-header">Подборки</span>
+        <button type="button" id="new-collection-btn" title="Создать подборку">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+      <div id="collections-list" class="collections-list"></div>
+    </div>
+  </aside>
+
+  <!-- Рабочая область -->
+  <div class="main-wrapper">
+    <!-- Каталог -->
+    <section id="view-catalog" class="view-panel active">
+      <header class="top-bar">
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="search-input" placeholder="Поиск по названию или тексту...">
+        </div>
+
+        <div class="controls-group">
+          <label class="inline-label">Сортировка:</label>
+          <select id="sort-select">
+            <option value="date-desc">Сначала новые</option>
+            <option value="date-asc">Сначала старые</option>
+            <option value="rating-desc">Оценка: по убыванию</option>
+            <option value="rating-asc">Оценка: по возрастанию</option>
+            <option value="title-asc">По названию (А-Я)</option>
+            <option value="title-desc">По названию (Я-А)</option>
+          </select>
+        </div>
+
+        <!-- Переключатель Сетка / Список -->
+        <div class="view-mode-toggle">
+          <button type="button" id="view-mode-grid" class="view-mode-btn active" title="Сетка">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          </button>
+          <button type="button" id="view-mode-list" class="view-mode-btn" title="Список">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </button>
+        </div>
+
+        <div id="active-tag-filter" class="active-tag-pill hidden">
+          <span>Тег: <b id="tag-name"></b></span>
+          <button id="clear-tag-btn">✕</button>
+        </div>
+      </header>
+
+      <main id="catalog" class="catalog-grid view-grid"></main>
+    </section>
+
+    <!-- Полноценная страница проекта -->
+    <section id="view-detail" class="view-panel">
+      <header class="detail-header-bar">
+        <button type="button" id="detail-back-btn" class="secondary-btn detail-back-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          <span>Назад в каталог</span>
+        </button>
+        <div class="detail-top-actions">
+          <button type="button" id="detail-fav-btn" class="heart-badge-btn" title="В избранное">
+            <svg viewBox="0 0 24 24" class="heart-icon"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          </button>
+          <button type="button" id="detail-edit-btn" class="secondary-btn">Редактировать</button>
+          <button type="button" id="detail-delete-btn" class="secondary-btn delete-btn">Удалить</button>
+        </div>
+      </header>
+
+      <main class="detail-content-wrap">
+        <div class="detail-card-shell">
+          <div class="detail-cover-col">
+            <div id="detail-cover-container" class="detail-cover-box"></div>
+          </div>
+          <div class="detail-info-col">
+            <h1 id="detail-title">Cyberpunk 2077</h1>
+
+            <div class="detail-meta-pills">
+              <span id="detail-type-pill" class="badge meta-pill-badge"></span>
+              <span id="detail-status-pill" class="badge meta-pill-badge"></span>
+              <div id="detail-rating-pill" class="detail-rating-wrap"></div>
+            </div>
+
+            <div class="detail-section">
+              <span class="detail-sec-label">Теги</span>
+              <div id="detail-tags-list" class="tags"></div>
+            </div>
+
+            <div class="detail-section">
+              <span class="detail-sec-label">Подборки</span>
+              <div id="detail-collections-list" class="tags"></div>
+            </div>
+
+            <div class="detail-section">
+              <span class="detail-sec-label">Описание</span>
+              <p id="detail-description" class="detail-text-content"></p>
+            </div>
+
+            <div class="detail-section">
+              <span class="detail-sec-label">Заметки</span>
+              <div id="detail-notes" class="detail-notes-card"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </section>
+
+    <!-- Менеджер тегов -->
+    <section id="view-tags" class="view-panel">
+      <header class="tags-header">
+        <h2>Управление тегами</h2>
+        <form id="tag-create-form" class="tag-create-form">
+          <input type="text" id="new-tag-name" required placeholder="Название тега">
+          <button type="submit" class="primary-btn">Создать тег</button>
+        </form>
+      </header>
+
+      <div class="tags-manager-container">
+        <table class="tags-table">
+          <thead>
+            <tr>
+              <th>Название тега</th>
+              <th>Использование</th>
+              <th style="text-align: right;">Действия</th>
+            </tr>
+          </thead>
+          <tbody id="tags-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- Модалка медиа -->
+  <div id="media-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-heading">Новая запись</h2>
+        <button type="button" class="close-btn" id="close-media-modal-x">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <form id="media-form">
+        <input type="hidden" id="edit-item-id">
+        <div class="form-layout">
+          <div class="drop-zone-container">
+            <div id="drop-zone" class="drop-zone">
+              <img id="cover-preview" class="cover-preview hidden" />
+              <div id="drop-placeholder" class="drop-placeholder">
+                <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                <p>Перетащите обложку сюда</p>
+                <small>или выберите файл с диска</small>
+              </div>
+            </div>
+            <input type="file" id="file-input" accept="image/*" class="hidden">
+            <button type="button" id="browse-btn" class="secondary-btn small-btn">Выбрать файл</button>
+          </div>
+
+          <div class="fields-container">
+            <div class="form-row">
+              <div class="flex-2">
+                <label>Название *</label>
+                <input type="text" id="title">
+              </div>
+              <div>
+                <label>Тип медиа</label>
+                <select id="media_type">
+                  <option value="game">Игра</option>
+                  <option value="movie">Фильм</option>
+                  <option value="series">Сериал</option>
+                  <option value="book">Книга</option>
+                  <option value="anime">Аниме</option>
+                  <option value="boardgame">Настолка</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Звёзды, статус и Избранное -->
+            <div class="form-row rating-status-row">
+              <div class="flex-2">
+                <label>Оценка</label>
+                <div class="star-rating-widget" id="star-picker">
+                  <div class="stars-track" id="stars-track"></div>
+                  <span id="star-score-label" class="star-score-label">Нет оценки</span>
+                  <button type="button" id="clear-rating-btn" class="clear-star-btn" title="Сбросить оценку">✕</button>
+                </div>
+              </div>
+              <div>
+                <label>Статус</label>
+                <select id="status">
+                  <option value="Запланировано">Запланировано</option>
+                  <option value="В процессе">В процессе</option>
+                  <option value="Завершено">Завершено</option>
+                  <option value="Брошено">Брошено</option>
+                </select>
+              </div>
+              <div class="fav-heart-wrap">
+                <label>Избранное</label>
+                <button type="button" id="fav-heart-btn" class="heart-toggle-btn" title="В избранное">
+                  <svg viewBox="0 0 24 24" class="heart-icon">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label>Выбрать теги</label>
+              <div id="modal-tags-picker" class="tags-picker"></div>
+            </div>
+
+            <div>
+              <label>Добавить в подборки</label>
+              <div id="modal-collections-picker" class="collections-picker"></div>
+            </div>
+
+            <label>Описание / Синопсис</label>
+            <textarea id="description" rows="2"></textarea>
+
+            <label>Личные комментарии</label>
+            <textarea id="notes" rows="3"></textarea>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="close-media-modal-btn" class="secondary-btn">Отмена</button>
+          <button type="submit" class="primary-btn">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Модалка подборки -->
+  <div id="collection-modal" class="modal hidden">
+    <div class="modal-content modal-small">
+      <div class="modal-header">
+        <h2>Новая подборка</h2>
+        <button type="button" class="close-btn" id="close-col-modal-x">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="collection-form">
+        <label>Название подборки</label>
+        <input type="text" id="new-col-input">
+        <div class="modal-actions">
+          <button type="button" id="close-col-modal-btn" class="secondary-btn">Отмена</button>
+          <button type="submit" class="primary-btn">Создать</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Модалка редактирования тега -->
+  <div id="edit-tag-modal" class="modal hidden">
+    <div class="modal-content modal-small">
+      <div class="modal-header">
+        <h2>Переименовать тег</h2>
+        <button type="button" class="close-btn" id="close-edit-tag-modal-x">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="edit-tag-form">
+        <input type="hidden" id="edit-tag-id">
+        <label>Новое имя тега</label>
+        <input type="text" id="edit-tag-name-input" required placeholder="Название тега">
+        <div class="modal-actions">
+          <button type="button" id="close-edit-tag-modal-btn" class="secondary-btn">Отмена</button>
+          <button type="submit" class="primary-btn">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
