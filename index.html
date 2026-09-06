@@ -3,16 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <title>ShelfBox</title>
+  <script>
+    try {
+      const savedTheme = localStorage.getItem('shelfbox_theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    } catch (e) {}
+  </script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <!-- Сайдбар -->
   <aside class="sidebar">
-    <div class="brand">
-      <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M4 6h16M4 12h16M4 18h7"/>
-      </svg>
-      <span class="brand-text">ShelfBox</span>
+    <div class="brand-row">
+      <div class="brand">
+        <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 6h16M4 12h16M4 18h7"/>
+        </svg>
+        <span class="brand-text">ShelfBox</span>
+      </div>
+      <button type="button" class="theme-toggle-header-btn" id="theme-toggle-btn" title="Сменить тему оформления">
+        <span id="theme-icon" class="theme-icon"></span>
+      </button>
     </div>
 
     <button id="open-add-modal-btn" class="primary-btn add-btn">
@@ -193,7 +204,7 @@
       <header class="tags-header">
         <h2>Управление тегами</h2>
         <div class="tags-header-controls">
-          <input type="text" id="tags-search-input" class="tags-search-bar" placeholder="🔍 Поиск среди тегов...">
+          <input type="text" id="tags-search-input" class="tags-search-bar" placeholder="Поиск среди тегов...">
           <form id="tag-create-form" class="tag-create-form">
             <input type="text" id="new-tag-name" required placeholder="Название нового тега">
             <button type="submit" class="primary-btn">Создать тег</button>

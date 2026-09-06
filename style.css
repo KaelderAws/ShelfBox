@@ -1,3 +1,155 @@
+:root {
+  /* Тёмная тема (по умолчанию) */
+  --bg-app: #09090b;
+  --bg-sidebar: #111114;
+  --bg-header: #0e0e11;
+  --bg-card: #121215;
+  --bg-card-hover: #151519;
+  --bg-card-cover-empty: #151518;
+  --bg-hover: #18181b;
+  --bg-active: #27272a;
+  --bg-input: #141417;
+  --bg-modal-overlay: rgba(0, 0, 0, 0.75);
+  --bg-modal: #111114;
+  --bg-notes: #141418;
+  --bg-notes-border: #222227;
+  --bg-table-header: #141418;
+  --bg-table-row: #111114;
+
+  --border-color: #1f1f23;
+  --border-subtle: #27272a;
+  --border-hover: #3f3f46;
+  --border-focus: #52525b;
+
+  --text-main: #fafafa;
+  --text-muted: #a1a1aa;
+  --text-dimmed: #71717a;
+  --text-faint: #52525b;
+
+  /* Кнопки primary: стильный тёмный вид под стать теме */
+  --btn-primary-bg: #222227;
+  --btn-primary-border: #35353d;
+  --btn-primary-text: #f4f4f5;
+  --btn-primary-hover-bg: #2d2d35;
+  --btn-primary-hover-border: #4d4d5a;
+
+  --btn-secondary-bg: #18181b;
+  --btn-secondary-border: #27272a;
+  --btn-secondary-text: #d4d4d8;
+  --btn-secondary-hover-bg: #27272a;
+  --btn-secondary-hover-text: #fafafa;
+
+  --heart-badge-bg: rgba(18, 18, 21, 0.85);
+  --heart-badge-border: rgba(255, 255, 255, 0.08);
+
+  --badge-bg: #18181b;
+  --badge-border: #27272a;
+  --badge-text: #a1a1aa;
+
+  --scrollbar-track: #0d0d10;
+  --scrollbar-thumb: #242429;
+  --scrollbar-thumb-hover: #383842;
+
+  --timeline-line: #27272a;
+  --timeline-dot: #27272a;
+  --timeline-dot-border: #111114;
+  --timeline-dot-shadow: #3f3f46;
+  --timeline-dot-active: #fafafa;
+  --timeline-dot-active-shadow: #71717a;
+
+  --status-planned-bg: rgba(59, 130, 246, 0.12);
+  --status-planned-border: rgba(59, 130, 246, 0.3);
+  --status-planned-text: #60a5fa;
+
+  --status-progress-bg: rgba(245, 158, 11, 0.12);
+  --status-progress-border: rgba(245, 158, 11, 0.3);
+  --status-progress-text: #fbbf24;
+
+  --status-completed-bg: rgba(16, 185, 129, 0.12);
+  --status-completed-border: rgba(16, 185, 129, 0.3);
+  --status-completed-text: #34d399;
+
+  --status-dropped-bg: rgba(239, 68, 68, 0.12);
+  --status-dropped-border: rgba(239, 68, 68, 0.3);
+  --status-dropped-text: #f87171;
+}
+
+[data-theme="light"] {
+  /* Светлая тема */
+  --bg-app: #f4f4f7;
+  --bg-sidebar: #ffffff;
+  --bg-header: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8f8fb;
+  --bg-card-cover-empty: #f1f2f6;
+  --bg-hover: #f1f2f6;
+  --bg-active: #e4e5ea;
+  --bg-input: #ffffff;
+  --bg-modal-overlay: rgba(15, 23, 42, 0.55);
+  --bg-modal: #ffffff;
+  --bg-notes: #f8f8fb;
+  --bg-notes-border: #e4e5ea;
+  --bg-table-header: #f8f8fb;
+  --bg-table-row: #ffffff;
+
+  --border-color: #e4e5ea;
+  --border-subtle: #e4e5ea;
+  --border-hover: #cbd0dc;
+  --border-focus: #949eb2;
+
+  --text-main: #09090b;
+  --text-muted: #52525b;
+  --text-dimmed: #71717a;
+  --text-faint: #a1a1aa;
+
+  /* Кнопки primary: элегантный светлый вид под стать теме */
+  --btn-primary-bg: #ffffff;
+  --btn-primary-border: #cbd0dc;
+  --btn-primary-text: #18181b;
+  --btn-primary-hover-bg: #f1f2f6;
+  --btn-primary-hover-border: #949eb2;
+
+  --btn-secondary-bg: #f4f4f7;
+  --btn-secondary-border: #e4e5ea;
+  --btn-secondary-text: #18181b;
+  --btn-secondary-hover-bg: #e4e5ea;
+  --btn-secondary-hover-text: #000000;
+
+  --heart-badge-bg: rgba(255, 255, 255, 0.9);
+  --heart-badge-border: rgba(0, 0, 0, 0.12);
+
+  --badge-bg: #f4f4f7;
+  --badge-border: #e4e5ea;
+  --badge-text: #52525b;
+
+  --scrollbar-track: #f1f2f6;
+  --scrollbar-thumb: #d4d5dc;
+  --scrollbar-thumb-hover: #a1a2ab;
+
+  --timeline-line: #e4e5ea;
+  --timeline-dot: #cbd0dc;
+  --timeline-dot-border: #ffffff;
+  --timeline-dot-shadow: #949eb2;
+  --timeline-dot-active: #09090b;
+  --timeline-dot-active-shadow: #71717a;
+
+  --status-planned-bg: rgba(59, 130, 246, 0.1);
+  --status-planned-border: rgba(59, 130, 246, 0.35);
+  --status-planned-text: #2563eb;
+
+  --status-progress-bg: rgba(245, 158, 11, 0.1);
+  --status-progress-border: rgba(245, 158, 11, 0.35);
+  --status-progress-text: #d97706;
+
+  --status-completed-bg: rgba(16, 185, 129, 0.1);
+  --status-completed-border: rgba(16, 185, 129, 0.35);
+  --status-completed-text: #059669;
+
+  --status-dropped-bg: rgba(239, 68, 68, 0.1);
+  --status-dropped-border: rgba(239, 68, 68, 0.35);
+  --status-dropped-text: #dc2626;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -6,52 +158,61 @@
   -webkit-font-smoothing: antialiased;
 }
 
-/* Стилизация всех скроллбаров под общий темный дизайн */
+/* Стилизация скроллбаров */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0d0d10;
+  background: var(--scrollbar-track);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #242429;
+  background: var(--scrollbar-thumb);
   border-radius: 4px;
-  border: 2px solid #0d0d10;
+  border: 2px solid var(--scrollbar-track);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #383842;
+  background: var(--scrollbar-thumb-hover);
 }
 
 body {
-  background: #09090b;
-  color: #f4f4f5;
+  background: var(--bg-app);
+  color: var(--text-main);
   display: flex;
   height: 100vh;
   overflow: hidden;
+  transition: background 0.2s, color 0.2s;
 }
 
 /* Сайдбар */
 .sidebar {
   width: 250px;
-  background: #111114;
-  border-right: 1px solid #1f1f23;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-color);
   padding: 20px 14px;
   display: flex;
   flex-direction: column;
   gap: 20px;
   overflow-y: auto;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 2px 2px 2px 6px;
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 4px 6px;
-  color: #fafafa;
+  color: var(--text-main);
 }
 
 .brand-icon {
@@ -65,10 +226,37 @@ body {
   letter-spacing: -0.3px;
 }
 
+.theme-toggle-header-btn {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.theme-toggle-header-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-main);
+  border-color: var(--border-hover);
+}
+
+.theme-toggle-header-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
 .add-btn {
   width: 100%;
+  height: 38px;
   font-size: 13.5px;
-  padding: 9px 14px;
+  padding: 0 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -89,7 +277,7 @@ body {
 .nav-header {
   font-size: 11px;
   text-transform: uppercase;
-  color: #71717a;
+  color: var(--text-dimmed);
   font-weight: 600;
   letter-spacing: 0.5px;
   margin-bottom: 6px;
@@ -105,8 +293,8 @@ body {
 
 #new-collection-btn {
   background: transparent;
-  border: 1px solid #27272a;
-  color: #a1a1aa;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
   width: 20px;
   height: 20px;
   border-radius: 4px;
@@ -121,15 +309,15 @@ body {
   height: 12px;
 }
 #new-collection-btn:hover {
-  background: #27272a;
-  color: #fff;
-  border-color: #3f3f46;
+  background: var(--bg-active);
+  color: var(--text-main);
+  border-color: var(--border-hover);
 }
 
 .nav-item {
   background: transparent;
   border: none;
-  color: #a1a1aa;
+  color: var(--text-muted);
   padding: 8px 10px;
   border-radius: 6px;
   cursor: pointer;
@@ -150,13 +338,13 @@ body {
 }
 
 .nav-item:hover {
-  background: #18181b;
-  color: #e4e4e7;
+  background: var(--bg-hover);
+  color: var(--text-main);
 }
 
 .nav-item.active {
-  background: #27272a;
-  color: #fafafa;
+  background: var(--bg-active);
+  color: var(--text-main);
   font-weight: 500;
 }
 
@@ -183,7 +371,7 @@ body {
 .del-collection-btn {
   background: transparent;
   border: none;
-  color: #52525b;
+  color: var(--text-faint);
   font-size: 12px;
   cursor: pointer;
   padding: 2px 6px;
@@ -216,12 +404,13 @@ body {
 
 .top-bar {
   padding: 14px 28px;
-  background: #0e0e11;
-  border-bottom: 1px solid #1f1f23;
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   gap: 18px;
   flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .search-wrap {
@@ -236,23 +425,23 @@ body {
   transform: translateY(-50%);
   width: 15px;
   height: 15px;
-  color: #71717a;
+  color: var(--text-dimmed);
   pointer-events: none;
 }
 
 #search-input {
   width: 100%;
-  background: #141417;
-  border: 1px solid #27272a;
-  color: #f4f4f5;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
   padding: 8px 12px 8px 34px;
   border-radius: 6px;
   font-size: 13.5px;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, background 0.2s, color 0.2s;
 }
 #search-input:focus {
   outline: none;
-  border-color: #52525b;
+  border-color: var(--border-focus);
 }
 
 .controls-group {
@@ -263,22 +452,23 @@ body {
 
 .inline-label {
   font-size: 13px;
-  color: #71717a;
+  color: var(--text-dimmed);
 }
 
 select {
-  background: #141417;
-  border: 1px solid #27272a;
-  color: #e4e4e7;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
   padding: 8px 12px;
   border-radius: 6px;
   font-size: 13px;
   height: 36px;
   cursor: pointer;
+  transition: border-color 0.15s, background 0.2s, color 0.2s;
 }
 select:focus {
   outline: none;
-  border-color: #52525b;
+  border-color: var(--border-focus);
 }
 
 #tag-filter-select {
@@ -289,17 +479,18 @@ select:focus {
 /* Переключатель вида (Сетка / Список) */
 .view-mode-toggle {
   display: inline-flex;
-  background: #141417;
-  border: 1px solid #27272a;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
   border-radius: 6px;
   padding: 2px;
   gap: 2px;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .view-mode-btn {
   background: transparent;
   border: none;
-  color: #71717a;
+  color: var(--text-dimmed);
   width: 32px;
   height: 30px;
   border-radius: 4px;
@@ -314,11 +505,11 @@ select:focus {
   height: 15px;
 }
 .view-mode-btn:hover {
-  color: #d4d4d8;
+  color: var(--text-main);
 }
 .view-mode-btn.active {
-  background: #27272a;
-  color: #fafafa;
+  background: var(--bg-active);
+  color: var(--text-main);
 }
 
 /* Область каталога скроллится вертикально */
@@ -327,6 +518,7 @@ select:focus {
   overflow-y: auto;
   overflow-x: hidden;
   padding: 24px 28px;
+  background: var(--bg-app);
 }
 
 /* Сетка: фиксированный размер карточек (200px ширина, 370px высота), никогда не уменьшаются */
@@ -353,20 +545,20 @@ select:focus {
   min-height: 370px;
   max-height: 370px;
   flex-shrink: 0;
-  background: #121215;
-  border: 1px solid #1f1f23;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   position: relative;
   cursor: pointer;
-  transition: transform 0.15s, border-color 0.15s;
+  transition: transform 0.15s, border-color 0.15s, background 0.2s;
 }
 
 .card:hover {
   transform: translateY(-2px);
-  border-color: #2e2e33;
+  border-color: var(--border-hover);
 }
 
 /* Фиксированная высота обложки в карточке */
@@ -376,7 +568,7 @@ select:focus {
   min-height: 240px;
   max-height: 240px;
   object-fit: cover;
-  background: #151518;
+  background: var(--bg-card-cover-empty);
   display: block;
   flex-shrink: 0;
 }
@@ -389,15 +581,15 @@ select:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #151518;
-  border-bottom: 1px solid #1f1f23;
+  background: var(--bg-card-cover-empty);
+  border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
 }
 
 .empty-icon {
   width: 32px;
   height: 32px;
-  color: #3f3f46;
+  color: var(--text-faint);
 }
 
 /* Кнопка сердечка */
@@ -405,8 +597,8 @@ select:focus {
   position: absolute;
   top: 8px;
   right: 8px;
-  background: rgba(18, 18, 21, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--heart-badge-bg);
+  border: 1px solid var(--heart-badge-border);
   width: 30px;
   height: 30px;
   border-radius: 50%;
@@ -421,14 +613,14 @@ select:focus {
 
 .heart-badge-btn:hover {
   transform: scale(1.12);
-  border-color: #3f3f46;
+  border-color: var(--border-hover);
 }
 
 .heart-badge-btn .heart-icon {
   width: 16px;
   height: 16px;
   fill: transparent;
-  stroke: #71717a;
+  stroke: var(--text-dimmed);
   stroke-width: 2;
   transition: all 0.15s;
 }
@@ -438,12 +630,17 @@ select:focus {
   border-color: #7f1d1d;
 }
 
+[data-theme="light"] .heart-badge-btn.active {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
 .heart-badge-btn.active .heart-icon {
   fill: #ef4444;
   stroke: #ef4444;
 }
 
-/* Тело карточки: строго 130px */
+/* Тело карточки */
 .card-body.compact-body {
   height: 130px;
   min-height: 130px;
@@ -453,14 +650,15 @@ select:focus {
   flex-direction: column;
   justify-content: space-between;
   flex-shrink: 0;
-  background: #121215;
+  background: var(--bg-card-body);
+  transition: background 0.2s;
 }
 
 .card-title {
   font-size: 14px;
   font-weight: 600;
   line-height: 1.25;
-  color: #fafafa;
+  color: var(--text-main);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -473,12 +671,12 @@ select:focus {
 }
 
 .badge {
-  background: #18181b;
-  border: 1px solid #27272a;
+  background: var(--badge-bg);
+  border: 1px solid var(--badge-border);
   padding: 2px 7px;
   border-radius: 4px;
   font-size: 11px;
-  color: #a1a1aa;
+  color: var(--badge-text);
   white-space: nowrap;
 }
 
@@ -492,7 +690,7 @@ select:focus {
 
 .no-score-text {
   font-size: 11px;
-  color: #52525b;
+  color: var(--text-faint);
 }
 
 .star-card-row {
@@ -513,7 +711,7 @@ select:focus {
 
 .star-card-score {
   font-size: 11.5px;
-  color: #d4d4d8;
+  color: var(--text-muted);
   font-weight: 600;
 }
 
@@ -522,7 +720,7 @@ select:focus {
   justify-content: space-between;
   align-items: center;
   padding-top: 6px;
-  border-top: 1px solid #1a1a1e;
+  border-top: 1px solid var(--border-color);
 }
 
 .type-badge-row {
@@ -530,7 +728,7 @@ select:focus {
   align-items: center;
   gap: 5px;
   font-size: 11.5px;
-  color: #71717a;
+  color: var(--text-dimmed);
 }
 .type-badge-row svg {
   width: 13px;
@@ -548,16 +746,16 @@ select:focus {
   font-size: 11.5px;
   cursor: pointer;
   font-weight: 500;
-  color: #a1a1aa;
+  color: var(--text-muted);
   transition: color 0.15s;
 }
-.action-link:hover { color: #fafafa; }
+.action-link:hover { color: var(--text-main); }
 .delete-btn:hover { color: #f87171; }
 
 /* Карточка в режиме списка */
 .list-card {
-  background: #121215;
-  border: 1px solid #1f1f23;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -569,8 +767,8 @@ select:focus {
 }
 
 .list-card:hover {
-  background: #151519;
-  border-color: #2e2e33;
+  background: var(--bg-card-hover);
+  border-color: var(--border-hover);
 }
 
 .list-cover {
@@ -581,7 +779,7 @@ select:focus {
   object-fit: cover;
   border-radius: 4px;
   flex-shrink: 0;
-  background: #17171b;
+  background: var(--bg-card-cover-empty);
 }
 
 .list-cover.cover-empty {
@@ -590,7 +788,7 @@ select:focus {
   min-width: 52px;
   min-height: 72px;
   max-height: 72px;
-  border: 1px solid #1f1f23;
+  border: 1px solid var(--border-color);
 }
 .list-cover .empty-icon {
   width: 22px;
@@ -614,7 +812,7 @@ select:focus {
 
 .list-desc {
   font-size: 12.5px;
-  color: #71717a;
+  color: var(--text-dimmed);
   line-height: 1.35;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -634,12 +832,13 @@ select:focus {
 /* Полноценная страница проекта */
 .detail-header-bar {
   padding: 14px 28px;
-  background: #0e0e11;
-  border-bottom: 1px solid #1f1f23;
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .detail-back-btn {
@@ -672,7 +871,8 @@ select:focus {
   flex: 1;
   overflow-y: auto;
   padding: 30px;
-  background: #09090b;
+  background: var(--bg-app);
+  transition: background 0.2s;
 }
 
 /* Карточка проекта растягивается по ширине окна всегда */
@@ -681,10 +881,11 @@ select:focus {
   gap: 36px;
   width: 100%;
   margin: 0;
-  background: #111114;
-  border: 1px solid #1f1f24;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 30px;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .detail-cover-col {
@@ -697,8 +898,8 @@ select:focus {
   height: 360px;
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid #27272a;
-  background: #141417;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card-cover-empty);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -731,7 +932,7 @@ select:focus {
   font-size: 26px;
   font-weight: 700;
   letter-spacing: -0.5px;
-  color: #fafafa;
+  color: var(--text-main);
   line-height: 1.25;
   word-break: break-word;
 }
@@ -765,67 +966,68 @@ select:focus {
 .detail-sec-label {
   font-size: 11.5px;
   text-transform: uppercase;
-  color: #71717a;
+  color: var(--text-dimmed);
   letter-spacing: 0.6px;
   font-weight: 600;
 }
 
 .detail-text-content {
   font-size: 14px;
-  color: #d4d4d8;
+  color: var(--text-main);
   line-height: 1.6;
   white-space: pre-wrap;
   word-break: break-word;
 }
 
-/* Личные заметки без цветных полосок */
+/* Личные заметки */
 .detail-notes-card {
   font-size: 13.5px;
-  color: #e4e4e7;
-  background: #141418;
-  border: 1px solid #222227;
+  color: var(--text-main);
+  background: var(--bg-notes);
+  border: 1px solid var(--bg-notes-border);
   border-radius: 6px;
   padding: 14px 16px;
   line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-word;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .empty-muted-label {
   font-size: 12.5px;
-  color: #52525b;
+  color: var(--text-faint);
   font-style: italic;
 }
 
 /* Статусы */
 .status-badge-planned {
-  background: rgba(59, 130, 246, 0.12);
-  border-color: rgba(59, 130, 246, 0.3);
-  color: #60a5fa;
+  background: var(--status-planned-bg);
+  border-color: var(--status-planned-border);
+  color: var(--status-planned-text);
 }
 
 .status-badge-in-progress {
-  background: rgba(245, 158, 11, 0.12);
-  border-color: rgba(245, 158, 11, 0.3);
-  color: #fbbf24;
+  background: var(--status-progress-bg);
+  border-color: var(--status-progress-border);
+  color: var(--status-progress-text);
 }
 
 .status-badge-completed {
-  background: rgba(16, 185, 129, 0.12);
-  border-color: rgba(16, 185, 129, 0.3);
-  color: #34d399;
+  background: var(--status-completed-bg);
+  border-color: var(--status-completed-border);
+  color: var(--status-completed-text);
 }
 
 .status-badge-dropped {
-  background: rgba(239, 68, 68, 0.12);
-  border-color: rgba(239, 68, 68, 0.3);
-  color: #f87171;
+  background: var(--status-dropped-bg);
+  border-color: var(--status-dropped-border);
+  color: var(--status-dropped-text);
 }
 
 .status-badge-default {
-  background: #18181b;
-  border-color: #27272a;
-  color: #a1a1aa;
+  background: var(--badge-bg);
+  border-color: var(--badge-border);
+  color: var(--badge-text);
 }
 
 /* Таймлайн истории статусов */
@@ -845,7 +1047,7 @@ select:focus {
   top: 6px;
   bottom: 6px;
   width: 2px;
-  background: #27272a;
+  background: var(--timeline-line);
   border-radius: 1px;
 }
 
@@ -863,15 +1065,16 @@ select:focus {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: #27272a;
-  border: 2px solid #111114;
-  box-shadow: 0 0 0 2px #3f3f46;
+  background: var(--timeline-dot);
+  border: 2px solid var(--timeline-dot-border);
+  box-shadow: 0 0 0 2px var(--timeline-dot-shadow);
   z-index: 1;
+  transition: all 0.2s;
 }
 
 .status-history-entry.status-active .status-history-dot {
-  background: #fafafa;
-  box-shadow: 0 0 0 2px #71717a, 0 0 8px rgba(255, 255, 255, 0.4);
+  background: var(--timeline-dot-active);
+  box-shadow: 0 0 0 2px var(--timeline-dot-active-shadow), 0 0 8px rgba(0, 0, 0, 0.25);
 }
 
 .status-history-content {
@@ -883,7 +1086,7 @@ select:focus {
 
 .status-history-date {
   font-size: 12px;
-  color: #71717a;
+  color: var(--text-dimmed);
 }
 
 /* Теги */
@@ -898,14 +1101,14 @@ select:focus {
   padding: 3px 8px;
   border-radius: 4px;
   cursor: pointer;
-  color: #a1a1aa;
-  background: #18181b;
-  border: 1px solid #27272a;
+  color: var(--text-muted);
+  background: var(--badge-bg);
+  border: 1px solid var(--border-subtle);
   transition: all 0.15s;
 }
 .tag:hover {
-  color: #fafafa;
-  border-color: #3f3f46;
+  color: var(--text-main);
+  border-color: var(--border-hover);
 }
 
 /* Виджет звёзд в модалке */
@@ -914,12 +1117,13 @@ select:focus {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  background: #141417;
-  border: 1px solid #27272a;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
   padding: 0 10px;
   border-radius: 6px;
   height: 38px;
   width: 100%;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .stars-track {
@@ -944,7 +1148,7 @@ select:focus {
 .stars-bg svg {
   width: 22px;
   height: 18px;
-  fill: #27272a;
+  fill: var(--border-subtle);
   flex-shrink: 0;
 }
 
@@ -963,7 +1167,7 @@ select:focus {
 
 .star-score-label {
   font-size: 12.5px;
-  color: #a1a1aa;
+  color: var(--text-muted);
   font-weight: 600;
   white-space: nowrap;
   text-align: center;
@@ -973,7 +1177,7 @@ select:focus {
 .clear-star-btn {
   background: none;
   border: none;
-  color: #52525b;
+  color: var(--text-faint);
   cursor: pointer;
   font-size: 12px;
   padding: 2px 4px;
@@ -988,8 +1192,8 @@ select:focus {
 
 /* Сердечко в модалке */
 .heart-toggle-btn {
-  background: #141417;
-  border: 1px solid #27272a;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
   height: 38px;
   width: 100%;
   border-radius: 6px;
@@ -1001,15 +1205,15 @@ select:focus {
 }
 
 .heart-toggle-btn:hover {
-  border-color: #3f3f46;
-  background: #18181c;
+  border-color: var(--border-hover);
+  background: var(--bg-hover);
 }
 
 .heart-toggle-btn .heart-icon {
   width: 18px;
   height: 18px;
   fill: none;
-  stroke: #71717a;
+  stroke: var(--text-dimmed);
   stroke-width: 2;
   transition: all 0.15s;
 }
@@ -1028,24 +1232,27 @@ select:focus {
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: var(--bg-modal-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 100;
   padding: 20px;
   backdrop-filter: blur(2px);
+  transition: background 0.2s;
 }
 
 .modal-content {
-  background: #111114;
-  border: 1px solid #27272a;
+  background: var(--bg-modal);
+  border: 1px solid var(--border-subtle);
   border-radius: 12px;
   width: 980px;
   max-width: 96%;
   max-height: 90vh;
   overflow-y: auto;
   padding: 26px 30px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .modal-small {
@@ -1062,13 +1269,13 @@ select:focus {
 .modal-header h2 {
   font-size: 19px;
   font-weight: 600;
-  color: #fafafa;
+  color: var(--text-main);
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: #71717a;
+  color: var(--text-dimmed);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1079,7 +1286,7 @@ select:focus {
   width: 18px;
   height: 18px;
 }
-.close-btn:hover { color: #fafafa; }
+.close-btn:hover { color: var(--text-main); }
 
 .form-layout {
   display: flex;
@@ -1098,7 +1305,7 @@ select:focus {
   width: 100%;
   aspect-ratio: 2 / 3;
   height: auto;
-  border: 1px dashed #27272a;
+  border: 1px dashed var(--border-subtle);
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -1106,12 +1313,12 @@ select:focus {
   text-align: center;
   cursor: pointer;
   overflow: hidden;
-  background: #141417;
+  background: var(--bg-input);
   transition: all 0.15s;
 }
 .drop-zone:hover, .drop-zone.dragover {
-  border-color: #52525b;
-  background: #18181c;
+  border-color: var(--border-focus);
+  background: var(--bg-hover);
 }
 
 .cover-preview {
@@ -1122,7 +1329,7 @@ select:focus {
 }
 
 .drop-placeholder {
-  color: #71717a;
+  color: var(--text-dimmed);
   font-size: 13px;
   padding: 16px;
 }
@@ -1182,18 +1389,18 @@ select:focus {
 .modal-select {
   width: 100%;
   height: 38px;
-  background: #141417;
-  border: 1px solid #27272a;
-  color: #e4e4e7;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
   padding: 0 10px;
   border-radius: 6px;
   font-size: 13.5px;
   cursor: pointer;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, background 0.2s, color 0.2s;
 }
 .modal-select:focus {
   outline: none;
-  border-color: #52525b;
+  border-color: var(--border-focus);
 }
 
 /* Строка 3: Теги и Подборки */
@@ -1211,19 +1418,20 @@ select:focus {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  background: #141417;
-  border: 1px solid #27272a;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
   padding: 8px 10px;
   border-radius: 6px;
   min-height: 48px;
   max-height: 85px;
   overflow-y: auto;
   align-content: flex-start;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .empty-picker-hint {
   font-size: 12px;
-  color: #52525b;
+  color: var(--text-faint);
   font-style: italic;
   line-height: 30px;
   padding-left: 2px;
@@ -1241,20 +1449,20 @@ select:focus {
 
 label {
   font-size: 12px;
-  color: #a1a1aa;
+  color: var(--text-muted);
   margin-bottom: 5px;
   display: block;
 }
 
 input[type="text"], textarea {
   width: 100%;
-  background: #141417;
-  border: 1px solid #27272a;
-  color: #fafafa;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
   padding: 8px 12px;
   border-radius: 6px;
   font-size: 13.5px;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, background 0.2s, color 0.2s;
 }
 
 input[type="text"] {
@@ -1269,7 +1477,7 @@ textarea {
 
 input[type="text"]:focus, textarea:focus {
   outline: none;
-  border-color: #52525b;
+  border-color: var(--border-focus);
 }
 
 .picker-item {
@@ -1277,17 +1485,17 @@ input[type="text"]:focus, textarea:focus {
   padding: 4px 9px;
   border-radius: 4px;
   cursor: pointer;
-  background: #18181b;
-  color: #a1a1aa;
-  border: 1px solid #27272a;
+  background: var(--badge-bg);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
   user-select: none;
   transition: all 0.15s;
 }
 
 .picker-item.selected {
-  background: #e4e4e7;
-  color: #09090b;
-  border-color: #e4e4e7;
+  background: var(--text-main);
+  color: var(--bg-app);
+  border-color: var(--text-main);
   font-weight: 500;
 }
 
@@ -1299,22 +1507,27 @@ input[type="text"]:focus, textarea:focus {
 }
 
 .primary-btn {
-  background: #fafafa;
-  color: #09090b;
-  border: none;
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  border: 1px solid var(--btn-primary-border);
   padding: 8px 16px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 500;
   font-size: 13.5px;
-  transition: opacity 0.15s;
+  white-space: nowrap;
+  transition: all 0.15s;
 }
-.primary-btn:hover { opacity: 0.9; }
+.primary-btn:hover {
+  background: var(--btn-primary-hover-bg);
+  border-color: var(--btn-primary-hover-border);
+  color: var(--text-main);
+}
 
 .secondary-btn {
-  background: #18181b;
-  color: #d4d4d8;
-  border: 1px solid #27272a;
+  background: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
+  border: 1px solid var(--btn-secondary-border);
   padding: 8px 16px;
   border-radius: 6px;
   cursor: pointer;
@@ -1322,8 +1535,8 @@ input[type="text"]:focus, textarea:focus {
   transition: all 0.15s;
 }
 .secondary-btn:hover {
-  background: #27272a;
-  color: #fafafa;
+  background: var(--btn-secondary-hover-bg);
+  color: var(--btn-secondary-hover-text);
 }
 
 .small-btn {
@@ -1334,71 +1547,98 @@ input[type="text"]:focus, textarea:focus {
 
 /* Экран тегов */
 .tags-header {
-  padding: 20px 28px;
-  background: #0e0e11;
-  border-bottom: 1px solid #1f1f23;
+  padding: 14px 28px;
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
   flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.tags-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
 }
 
 .tags-header-controls {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .tags-search-bar {
-  background: #141417;
-  border: 1px solid #27272a;
-  color: #fafafa;
-  padding: 8px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  padding: 0 12px;
   border-radius: 6px;
   font-size: 13px;
   width: 220px;
-  transition: border-color 0.15s;
+  height: 36px;
+  transition: border-color 0.15s, background 0.2s, color 0.2s;
 }
 
 .tags-search-bar:focus {
   outline: none;
-  border-color: #52525b;
+  border-color: var(--border-focus);
 }
 
 .tag-create-form {
   display: flex;
-  gap: 10px;
+  align-items: center;
+  gap: 8px;
 }
 
 .tag-create-form input[type="text"] {
-  width: 240px;
+  width: 220px;
+  height: 36px;
+  padding: 0 12px;
+  margin-bottom: 0;
+}
+
+.tag-create-form .primary-btn {
+  height: 36px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .tags-manager-container {
   flex: 1;
   overflow-y: auto;
   padding: 28px;
+  background: var(--bg-app);
 }
 
 .tags-table {
   width: 100%;
   border-collapse: collapse;
-  background: #111114;
-  border: 1px solid #1f1f23;
+  background: var(--bg-table-row);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   overflow: hidden;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .tags-table th, .tags-table td {
   padding: 12px 16px;
-  border-bottom: 1px solid #1f1f23;
+  border-bottom: 1px solid var(--border-color);
   text-align: left;
   font-size: 13.5px;
+  color: var(--text-main);
 }
 
 .tags-table th {
-  background: #141418;
-  color: #71717a;
+  background: var(--bg-table-header);
+  color: var(--text-dimmed);
   font-size: 11.5px;
   text-transform: uppercase;
   font-weight: 600;

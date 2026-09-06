@@ -9,6 +9,7 @@ let activeTag = null;
 let searchQuery = '';
 let currentSort = 'date-desc';
 let currentViewMode = localStorage.getItem('shelfbox_view_mode') || 'grid'; // 'grid' или 'list'
+let currentTheme = localStorage.getItem('shelfbox_theme') || 'dark';
 let openedItemId = null;
 let lastViewedItemId = null;
 let lastNavTime = 0;
@@ -87,6 +88,9 @@ const modalCollectionsPicker = document.getElementById('modal-collections-picker
 
 const detailStatusHistory = document.getElementById('detail-status-history');
 
+const themeToggleBtn = document.getElementById('theme-toggle-btn');
+const themeIcon = document.getElementById('theme-icon');
+
 const tagCreateForm = document.getElementById('tag-create-form');
 const tagsTableBody = document.getElementById('tags-table-body');
 const tagsSearchInput = document.getElementById('tags-search-input');
@@ -117,7 +121,35 @@ const mediaLabels = {
   boardgame: 'Комикс'
 };
 
+function applyTheme(theme) {
+  currentTheme = theme;
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('shelfbox_theme', theme);
+
+  if (theme === 'light') {
+    if (themeIcon) {
+      themeIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>';
+    }
+    if (themeToggleBtn) themeToggleBtn.title = 'Переключить на тёмную тему';
+  } else {
+    if (themeIcon) {
+      themeIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>';
+    }
+    if (themeToggleBtn) themeToggleBtn.title = 'Переключить на светлую тему';
+  }
+}
+
+function initTheme() {
+  applyTheme(currentTheme);
+  if (themeToggleBtn) {
+    themeToggleBtn.onclick = () => {
+      applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    };
+  }
+}
+
 async function init() {
+  initTheme();
   [allItems, allTags, allCollections] = await Promise.all([
     window.api.getItems(),
     window.api.getTags(),
