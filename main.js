@@ -106,9 +106,33 @@ db.exec(`
     PRIMARY KEY(item_id, collection_id)
   );
 
+  CREATE TABLE IF NOT EXISTS status_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    item_id INTEGER NOT NULL,
+    status TEXT NOT NULL,
+    changed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(item_id) REFERENCES items(id) ON DELETE CASCADE
+  );
+
   CREATE INDEX IF NOT EXISTS idx_items_type ON items(media_type);
   CREATE INDEX IF NOT EXISTS idx_items_fav ON items(is_favorite);
+  CREATE INDEX IF NOT EXISTS idx_status_history_item ON status_history(item_id);
 `);
+
+// Миграция старых записей настолок в комиксы
+try {
+  db.exec("UPDATE items SET media_type = 'comics' WHERE media_type = 'boardgame'");
+} catch (e) {}
+
+// Автозаполнение начальной истории для существующих записей
+try {
+  db.exec(`
+    INSERT INTO status_history (item_id, status, changed_at)
+    SELECT id, COALESCE(status, 'Запланировано'), COALESCE(created_at, CURRENT_TIMESTAMP)
+    FROM items
+    WHERE id NOT IN (SELECT DISTINCT item_id FROM status_history);
+  `);
+} catch (e) {}
 
 const stmts = {
   getAllItems: db.prepare('SELECT * FROM items ORDER BY is_favorite DESC, id DESC'),
@@ -130,9 +154,14 @@ const stmts = {
       notes = @notes
     WHERE id = @id
   `),
+  getItemMeta: db.prepare('SELECT id, status, cover_path FROM items WHERE id = ?'),
   getCoverById: db.prepare('SELECT cover_path FROM items WHERE id = ?'),
   deleteItem: db.prepare('DELETE FROM items WHERE id = ?'),
   toggleFavorite: db.prepare('UPDATE items SET is_favorite = ((is_favorite | 1) - (is_favorite & 1)) WHERE id = ?'),
+
+  insertStatusHistory: db.prepare('INSERT INTO status_history (item_id, status, changed_at) VALUES (?, ?, CURRENT_TIMESTAMP)'),
+  getItemStatusHistory: db.prepare('SELECT id, status, changed_at FROM status_history WHERE item_id = ? ORDER BY id DESC'),
+  deleteStatusHistory: db.prepare('DELETE FROM status_history WHERE item_id = ?'),
 
   linkCollection: db.prepare('INSERT OR IGNORE INTO item_collections (item_id, collection_id) VALUES (?, ?)'),
   unlinkCollections: db.prepare('DELETE FROM item_collections WHERE item_id = ?'),
@@ -201,16 +230,25 @@ const addItemTx = db.transaction((item) => {
       stmts.linkCollection.run(itemId, Number(colId));
     }
   }
+  // Добавляем начальный статус в историю
+  if (item.status) {
+    stmts.insertStatusHistory.run(itemId, item.status);
+  }
   return info;
 });
 
 const updateItemTx = db.transaction((item) => {
-  // Проверяем, изменилась ли обложка, и удаляем старую
-  const currentRecord = stmts.getCoverById.get(item.id);
+  // Получаем текущие метаданные для проверки обложки и статуса
+  const currentRecord = stmts.getItemMeta.get(item.id);
   const newNormalizedCover = normalizeCoverPath(item.cover_path);
 
   if (currentRecord && currentRecord.cover_path && currentRecord.cover_path !== newNormalizedCover) {
     removeCoverFile(currentRecord.cover_path);
+  }
+
+  // Если статус изменился — логируем новое состояние в историю статусов!
+  if (currentRecord && item.status && currentRecord.status !== item.status) {
+    stmts.insertStatusHistory.run(item.id, item.status);
   }
 
   const itemToSave = {
@@ -227,11 +265,12 @@ const updateItemTx = db.transaction((item) => {
 });
 
 const deleteItemTx = db.transaction((id) => {
-  const item = stmts.getCoverById.get(id);
+  const item = stmts.getItemMeta.get(id);
   if (item && item.cover_path) {
     removeCoverFile(item.cover_path);
   }
   stmts.unlinkCollections.run(id);
+  stmts.deleteStatusHistory.run(id);
   stmts.deleteItem.run(id);
 });
 
@@ -285,6 +324,15 @@ function createWindow() {
 
   win.removeMenu();
   win.loadFile('index.html');
+
+  // Обработка боковых кнопок мыши Windows (Назад / Вперед)
+  win.on('app-command', (e, cmd) => {
+    if (cmd === 'browser-backward') {
+      win.webContents.send('nav-back');
+    } else if (cmd === 'browser-forward') {
+      win.webContents.send('nav-forward');
+    }
+  });
 }
 
 app.whenReady().then(createWindow);
@@ -343,3 +391,7 @@ ipcMain.handle('delete-tag', (event, id) => deleteTagTx(id));
 ipcMain.handle('get-collections', () => stmts.getAllCollections.all());
 ipcMain.handle('create-collection', (event, name) => stmts.insertCollection.run(name));
 ipcMain.handle('delete-collection', (event, id) => deleteCollectionTx(id));
+
+ipcMain.handle('get-status-history', (event, itemId) => {
+  return stmts.getItemStatusHistory.all(Number(itemId));
+});

@@ -281,6 +281,11 @@ select:focus {
   border-color: #52525b;
 }
 
+#tag-filter-select {
+  max-width: 170px;
+  min-width: 120px;
+}
+
 /* Переключатель вида (Сетка / Список) */
 .view-mode-toggle {
   display: inline-flex;
@@ -314,25 +319,6 @@ select:focus {
 .view-mode-btn.active {
   background: #27272a;
   color: #fafafa;
-}
-
-.active-tag-pill {
-  background: #18181b;
-  color: #d4d4d8;
-  border: 1px solid #27272a;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.active-tag-pill button {
-  background: none;
-  border: none;
-  color: #a1a1aa;
-  cursor: pointer;
 }
 
 /* Область каталога скроллится вертикально */
@@ -811,6 +797,95 @@ select:focus {
   font-style: italic;
 }
 
+/* Статусы */
+.status-badge-planned {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #60a5fa;
+}
+
+.status-badge-in-progress {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+}
+
+.status-badge-completed {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #34d399;
+}
+
+.status-badge-dropped {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+.status-badge-default {
+  background: #18181b;
+  border-color: #27272a;
+  color: #a1a1aa;
+}
+
+/* Таймлайн истории статусов */
+.status-history-timeline {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-left: 20px;
+  margin-top: 6px;
+}
+
+.status-history-timeline::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  background: #27272a;
+  border-radius: 1px;
+}
+
+.status-history-entry {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.status-history-dot {
+  position: absolute;
+  left: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #27272a;
+  border: 2px solid #111114;
+  box-shadow: 0 0 0 2px #3f3f46;
+  z-index: 1;
+}
+
+.status-history-entry.status-active .status-history-dot {
+  background: #fafafa;
+  box-shadow: 0 0 0 2px #71717a, 0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+.status-history-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.status-history-date {
+  font-size: 12px;
+  color: #71717a;
+}
+
 /* Теги */
 .tags {
   display: flex;
@@ -834,28 +909,27 @@ select:focus {
 }
 
 /* Виджет звёзд в модалке */
-.rating-status-row {
-  align-items: flex-end;
-}
-
 .star-rating-widget {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  gap: 8px;
   background: #141417;
   border: 1px solid #27272a;
-  padding: 6px 12px;
+  padding: 0 10px;
   border-radius: 6px;
   height: 38px;
+  width: 100%;
 }
 
 .stars-track {
   position: relative;
   display: inline-flex;
-  width: 115px;
+  width: 110px;
   height: 18px;
   cursor: pointer;
   user-select: none;
+  flex-shrink: 0;
 }
 
 .stars-bg, .stars-fg {
@@ -868,7 +942,7 @@ select:focus {
 }
 
 .stars-bg svg {
-  width: 23px;
+  width: 22px;
   height: 18px;
   fill: #27272a;
   flex-shrink: 0;
@@ -881,17 +955,19 @@ select:focus {
 }
 
 .stars-fg svg {
-  width: 23px;
+  width: 22px;
   height: 18px;
   fill: #f59e0b;
   flex-shrink: 0;
 }
 
 .star-score-label {
-  font-size: 13px;
-  color: #e4e4e7;
+  font-size: 12.5px;
+  color: #a1a1aa;
   font-weight: 600;
-  min-width: 58px;
+  white-space: nowrap;
+  text-align: center;
+  flex: 1;
 }
 
 .clear-star-btn {
@@ -901,17 +977,16 @@ select:focus {
   cursor: pointer;
   font-size: 12px;
   padding: 2px 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color 0.15s;
+  flex-shrink: 0;
 }
 .clear-star-btn:hover { color: #f87171; }
 
 /* Сердечко в модалке */
-.fav-heart-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 0.35 !important;
-}
-
 .heart-toggle-btn {
   background: #141417;
   border: 1px solid #27272a;
@@ -927,6 +1002,7 @@ select:focus {
 
 .heart-toggle-btn:hover {
   border-color: #3f3f46;
+  background: #18181c;
 }
 
 .heart-toggle-btn .heart-icon {
@@ -939,8 +1015,8 @@ select:focus {
 }
 
 .heart-toggle-btn.active {
-  border-color: #7f1d1d;
-  background: #201214;
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
 }
 
 .heart-toggle-btn.active .heart-icon {
@@ -1011,7 +1087,8 @@ select:focus {
 }
 
 .drop-zone-container {
-  width: 240px;
+  width: 220px;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -1030,10 +1107,11 @@ select:focus {
   cursor: pointer;
   overflow: hidden;
   background: #141417;
-  transition: border-color 0.15s;
+  transition: all 0.15s;
 }
 .drop-zone:hover, .drop-zone.dragover {
   border-color: #52525b;
+  background: #18181c;
 }
 
 .cover-preview {
@@ -1057,9 +1135,10 @@ select:focus {
 
 .fields-container {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .form-row {
@@ -1067,13 +1146,103 @@ select:focus {
   gap: 14px;
 }
 
-.form-row > div { flex: 1; }
-.flex-2 { flex: 2 !important; }
+/* Строка 1: Название и Избранное */
+.title-fav-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.field-title-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.field-fav-wrap {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Строка 2: Тип, Статус, Оценка */
+.meta-triplet-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.25fr;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.meta-col {
+  min-width: 0;
+}
+
+.modal-select {
+  width: 100%;
+  height: 38px;
+  background: #141417;
+  border: 1px solid #27272a;
+  color: #e4e4e7;
+  padding: 0 10px;
+  border-radius: 6px;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.modal-select:focus {
+  outline: none;
+  border-color: #52525b;
+}
+
+/* Строка 3: Теги и Подборки */
+.tags-collections-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.half-col {
+  min-width: 0;
+}
+
+.tags-picker, .collections-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  background: #141417;
+  border: 1px solid #27272a;
+  padding: 8px 10px;
+  border-radius: 6px;
+  min-height: 48px;
+  max-height: 85px;
+  overflow-y: auto;
+  align-content: flex-start;
+}
+
+.empty-picker-hint {
+  font-size: 12px;
+  color: #52525b;
+  font-style: italic;
+  line-height: 30px;
+  padding-left: 2px;
+}
+
+/* Поля текста */
+.field-block {
+  width: 100%;
+}
+
+.required-star {
+  color: #ef4444;
+  font-weight: bold;
+}
 
 label {
-  font-size: 12.5px;
+  font-size: 12px;
   color: #a1a1aa;
-  margin-bottom: 4px;
+  margin-bottom: 5px;
   display: block;
 }
 
@@ -1087,21 +1256,20 @@ input[type="text"], textarea {
   font-size: 13.5px;
   transition: border-color 0.15s;
 }
+
+input[type="text"] {
+  height: 38px;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 52px;
+  line-height: 1.4;
+}
+
 input[type="text"]:focus, textarea:focus {
   outline: none;
   border-color: #52525b;
-}
-
-.tags-picker, .collections-picker {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  background: #141417;
-  border: 1px solid #27272a;
-  padding: 8px 10px;
-  border-radius: 6px;
-  max-height: 85px;
-  overflow-y: auto;
 }
 
 .picker-item {
@@ -1173,6 +1341,28 @@ input[type="text"]:focus, textarea:focus {
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;
+}
+
+.tags-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.tags-search-bar {
+  background: #141417;
+  border: 1px solid #27272a;
+  color: #fafafa;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  width: 220px;
+  transition: border-color 0.15s;
+}
+
+.tags-search-bar:focus {
+  outline: none;
+  border-color: #52525b;
 }
 
 .tag-create-form {

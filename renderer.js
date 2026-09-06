@@ -10,6 +10,8 @@ let searchQuery = '';
 let currentSort = 'date-desc';
 let currentViewMode = localStorage.getItem('shelfbox_view_mode') || 'grid'; // 'grid' или 'list'
 let openedItemId = null;
+let lastViewedItemId = null;
+let lastNavTime = 0;
 
 let selectedTagsForModal = [];
 let selectedCollectionsForModal = [];
@@ -77,37 +79,42 @@ const dropPlaceholder = document.getElementById('drop-placeholder');
 
 const searchInput = document.getElementById('search-input');
 const sortSelect = document.getElementById('sort-select');
+const tagFilterSelect = document.getElementById('tag-filter-select');
 const favFilterBtn = document.getElementById('filter-favorites');
-const activeTagPill = document.getElementById('active-tag-filter');
-const tagNameSpan = document.getElementById('tag-name');
-const clearTagBtn = document.getElementById('clear-tag-btn');
-
 const collectionsList = document.getElementById('collections-list');
 const modalTagsPicker = document.getElementById('modal-tags-picker');
 const modalCollectionsPicker = document.getElementById('modal-collections-picker');
 
+const detailStatusHistory = document.getElementById('detail-status-history');
+
 const tagCreateForm = document.getElementById('tag-create-form');
 const tagsTableBody = document.getElementById('tags-table-body');
+const tagsSearchInput = document.getElementById('tags-search-input');
+let tagSearchFilterQuery = '';
 
 const STAR_PATH = 'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z';
 const HEART_PATH = 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z';
 
 const typeIcons = {
-  game: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4m-2-2v4m7-2h.01m3 0h.01"/></svg>',
+  game: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 11h4M8 9v4"/><line x1="15" y1="12" x2="15.01" y2="12"/><line x1="18" y1="10" x2="18.01" y2="10"/><path d="M17.3 5H6.7A4 4 0 0 0 2.7 8.6L2 15a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.4-1.4A2 2 0 0 1 9.8 15h4.4a2 2 0 0 1 1.4.6L17 17c.5.5 1 1 2 1a3 3 0 0 0 3-3l-.7-6.4A4 4 0 0 0 17.3 5z"/></svg>',
   movie: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>',
   series: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>',
+  anime: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z"/><path d="M5 3v4M3 5h4M19 17v4M17 19h4"/></svg>',
   book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
-  anime: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>',
-  boardgame: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><circle cx="15.5" cy="8.5" r="1.5"/><circle cx="15.5" cy="15.5" r="1.5"/><circle cx="8.5" cy="15.5" r="1.5"/></svg>'
+  comics: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="13" y2="13"/></svg>',
+  manga: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M14 2v7l-2.5-1.5L9 9V2"/></svg>',
+  boardgame: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="13" y2="13"/></svg>'
 };
 
 const mediaLabels = {
   game: 'Игра',
   movie: 'Фильм',
   series: 'Сериал',
-  book: 'Книга',
   anime: 'Аниме',
-  boardgame: 'Настолка'
+  book: 'Книга',
+  comics: 'Комикс',
+  manga: 'Манга',
+  boardgame: 'Комикс'
 };
 
 async function init() {
@@ -116,6 +123,7 @@ async function init() {
     window.api.getTags(),
     window.api.getCollections()
   ]);
+  populateTagFilterSelect();
   buildStarRatingWidget();
   initHeartButton();
   updateViewModeToggle();
@@ -286,10 +294,24 @@ function renderCatalog() {
       matchCollection = itemCols.includes(Number(currentCollectionFilter));
     }
 
-    const matchSearch = !searchQuery || 
-      (item.title && item.title.toLowerCase().includes(searchQuery)) || 
-      (item.description && item.description.toLowerCase().includes(searchQuery)) ||
-      (item.notes && item.notes.toLowerCase().includes(searchQuery));
+    let matchSearch = true;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase().trim();
+      const titleMatch = Boolean(item.title && item.title.toLowerCase().includes(q));
+      const descMatch = Boolean(item.description && item.description.toLowerCase().includes(q));
+      const notesMatch = Boolean(item.notes && item.notes.toLowerCase().includes(q));
+
+      const tagQ = q.startsWith('#') ? q.slice(1).trim() : q;
+      let tagMatch = false;
+      if (item.tags && tagQ) {
+        try {
+          const tagsArr = JSON.parse(item.tags);
+          tagMatch = tagsArr.some(t => t.toLowerCase().includes(tagQ));
+        } catch (e) {}
+      }
+
+      matchSearch = titleMatch || descMatch || notesMatch || tagMatch;
+    }
 
     let matchTag = true;
     if (activeTag) {
@@ -346,7 +368,7 @@ function renderCatalog() {
       const statusRow = document.createElement('div');
       statusRow.className = 'status-row';
       const statusBadge = document.createElement('span');
-      statusBadge.className = 'badge';
+      statusBadge.className = `badge ${getStatusClass(item.status || 'Запланировано')}`;
       statusBadge.textContent = item.status || 'Запланировано';
       statusRow.appendChild(statusBadge);
       cardBody.appendChild(statusRow);
@@ -411,7 +433,7 @@ function renderCatalog() {
       rowTop.appendChild(typeBadge);
 
       const statusBadge = document.createElement('span');
-      statusBadge.className = 'badge';
+      statusBadge.className = `badge ${getStatusClass(item.status || 'Запланировано')}`;
       statusBadge.textContent = item.status || 'Запланировано';
       rowTop.appendChild(statusBadge);
 
@@ -476,6 +498,7 @@ function openDetailPage(id) {
   const item = allItems.find(i => Number(i.id) === Number(id));
   if (!item) return;
   openedItemId = item.id;
+  lastViewedItemId = item.id;
 
   detailTitle.textContent = item.title;
 
@@ -494,6 +517,7 @@ function openDetailPage(id) {
 
   detailTypePill.innerHTML = `${typeIcons[item.media_type] || ''}<span>${mediaLabels[item.media_type] || item.media_type}</span>`;
   detailStatusPill.textContent = item.status || 'Запланировано';
+  detailStatusPill.className = `badge meta-pill-badge ${getStatusClass(item.status || 'Запланировано')}`;
 
   detailRatingPill.innerHTML = '';
   if (item.rating) {
@@ -576,6 +600,9 @@ function openDetailPage(id) {
     detailNotes.textContent = 'Личных заметок пока нет';
   }
 
+  // История статусов
+  renderDetailStatusHistory(item.id);
+
   viewCatalog.classList.remove('active');
   viewTags.classList.remove('active');
   viewDetail.classList.add('active');
@@ -589,6 +616,106 @@ function closeDetailPage() {
 }
 
 detailBackBtn.onclick = closeDetailPage;
+
+function getStatusClass(status) {
+  switch (status) {
+    case 'Запланировано':
+      return 'status-badge-planned';
+    case 'В процессе':
+      return 'status-badge-in-progress';
+    case 'Завершено':
+      return 'status-badge-completed';
+    case 'Брошено':
+      return 'status-badge-dropped';
+    default:
+      return 'status-badge-default';
+  }
+}
+
+function formatHistoryDate(dateStr) {
+  if (!dateStr) return '';
+  try {
+    const formattedIso = dateStr.includes('T') ? dateStr : dateStr.replace(' ', 'T') + 'Z';
+    const date = new Date(formattedIso);
+    if (isNaN(date.getTime())) return dateStr;
+    return date.toLocaleString('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch (e) {
+    return dateStr;
+  }
+}
+
+async function renderDetailStatusHistory(itemId) {
+  if (!detailStatusHistory) return;
+  detailStatusHistory.innerHTML = '<span class="empty-muted-label">Загрузка истории...</span>';
+
+  try {
+    const history = await window.api.getStatusHistory(itemId);
+    if (!history || history.length === 0) {
+      detailStatusHistory.innerHTML = '<span class="empty-muted-label">История изменений пока пуста</span>';
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    history.forEach((entry, index) => {
+      const row = document.createElement('div');
+      row.className = `status-history-entry ${index === 0 ? 'status-active' : ''}`;
+
+      const dot = document.createElement('div');
+      dot.className = 'status-history-dot';
+
+      const content = document.createElement('div');
+      content.className = 'status-history-content';
+
+      const statusBadge = document.createElement('span');
+      statusBadge.className = `badge ${getStatusClass(entry.status)}`;
+      statusBadge.textContent = entry.status;
+      content.appendChild(statusBadge);
+
+      const dateSpan = document.createElement('span');
+      dateSpan.className = 'status-history-date';
+      dateSpan.textContent = formatHistoryDate(entry.changed_at);
+      content.appendChild(dateSpan);
+
+      row.appendChild(dot);
+      row.appendChild(content);
+      fragment.appendChild(row);
+    });
+
+    detailStatusHistory.innerHTML = '';
+    detailStatusHistory.appendChild(fragment);
+  } catch (err) {
+    console.error('Failed to load status history:', err);
+    detailStatusHistory.innerHTML = '<span class="empty-muted-label">Не удалось загрузить историю статусов</span>';
+  }
+}
+
+function populateTagFilterSelect() {
+  if (!tagFilterSelect) return;
+  const currentVal = tagFilterSelect.value;
+  tagFilterSelect.innerHTML = '<option value="">Все теги</option>';
+  allTags.forEach(tag => {
+    const opt = document.createElement('option');
+    opt.value = tag.name;
+    opt.textContent = tag.name;
+    tagFilterSelect.appendChild(opt);
+  });
+  if (activeTag && allTags.some(t => t.name === activeTag)) {
+    tagFilterSelect.value = activeTag;
+  } else if (currentVal && allTags.some(t => t.name === currentVal)) {
+    tagFilterSelect.value = currentVal;
+  } else {
+    tagFilterSelect.value = '';
+    if (activeTag && !allTags.some(t => t.name === activeTag)) {
+      activeTag = null;
+    }
+  }
+}
 
 function renderCollectionsSidebar() {
   const fragment = document.createDocumentFragment();
@@ -683,39 +810,47 @@ async function deleteCollection(id) {
 
 function renderModalPickers() {
   modalTagsPicker.innerHTML = '';
-  allTags.forEach(t => {
-    const isSelected = selectedTagsForModal.includes(t.name);
-    const pill = document.createElement('span');
-    pill.className = `picker-item ${isSelected ? 'selected' : ''}`;
-    pill.textContent = t.name;
-    pill.onclick = () => {
-      if (selectedTagsForModal.includes(t.name)) {
-        selectedTagsForModal = selectedTagsForModal.filter(name => name !== t.name);
-      } else {
-        selectedTagsForModal.push(t.name);
-      }
-      renderModalPickers();
-    };
-    modalTagsPicker.appendChild(pill);
-  });
+  if (!allTags || allTags.length === 0) {
+    modalTagsPicker.innerHTML = '<span class="empty-picker-hint">Нет созданных тегов</span>';
+  } else {
+    allTags.forEach(t => {
+      const isSelected = selectedTagsForModal.includes(t.name);
+      const pill = document.createElement('span');
+      pill.className = `picker-item ${isSelected ? 'selected' : ''}`;
+      pill.textContent = t.name;
+      pill.onclick = () => {
+        if (selectedTagsForModal.includes(t.name)) {
+          selectedTagsForModal = selectedTagsForModal.filter(name => name !== t.name);
+        } else {
+          selectedTagsForModal.push(t.name);
+        }
+        renderModalPickers();
+      };
+      modalTagsPicker.appendChild(pill);
+    });
+  }
 
   modalCollectionsPicker.innerHTML = '';
-  allCollections.forEach(c => {
-    const colId = Number(c.id);
-    const isSelected = selectedCollectionsForModal.includes(colId);
-    const pill = document.createElement('span');
-    pill.className = `picker-item ${isSelected ? 'selected' : ''}`;
-    pill.textContent = c.name;
-    pill.onclick = () => {
-      if (selectedCollectionsForModal.includes(colId)) {
-        selectedCollectionsForModal = selectedCollectionsForModal.filter(id => id !== colId);
-      } else {
-        selectedCollectionsForModal.push(colId);
-      }
-      renderModalPickers();
-    };
-    modalCollectionsPicker.appendChild(pill);
-  });
+  if (!allCollections || allCollections.length === 0) {
+    modalCollectionsPicker.innerHTML = '<span class="empty-picker-hint">Нет созданных подборок</span>';
+  } else {
+    allCollections.forEach(c => {
+      const colId = Number(c.id);
+      const isSelected = selectedCollectionsForModal.includes(colId);
+      const pill = document.createElement('span');
+      pill.className = `picker-item ${isSelected ? 'selected' : ''}`;
+      pill.textContent = c.name;
+      pill.onclick = () => {
+        if (selectedCollectionsForModal.includes(colId)) {
+          selectedCollectionsForModal = selectedCollectionsForModal.filter(id => id !== colId);
+        } else {
+          selectedCollectionsForModal.push(colId);
+        }
+        renderModalPickers();
+      };
+      modalCollectionsPicker.appendChild(pill);
+    });
+  }
 }
 
 function openAddModal() {
@@ -896,46 +1031,70 @@ tabTagsBtn.onclick = () => {
   renderTagsTable();
 };
 
+if (tagsSearchInput) {
+  tagsSearchInput.oninput = (e) => {
+    tagSearchFilterQuery = e.target.value.toLowerCase().trim();
+    renderTagsTable();
+  };
+}
+
 function renderTagsTable() {
   const fragment = document.createDocumentFragment();
 
-  allTags.forEach(tag => {
-    const usageCount = allItems.filter(it => {
-      const arr = it.tags ? JSON.parse(it.tags) : [];
-      return arr.includes(tag.name);
-    }).length;
-
-    const row = document.createElement('tr');
-    
-    const nameTd = document.createElement('td');
-    const boldTag = document.createElement('b');
-    boldTag.textContent = tag.name;
-    nameTd.appendChild(boldTag);
-    row.appendChild(nameTd);
-
-    const countTd = document.createElement('td');
-    countTd.textContent = `${usageCount} записей`;
-    row.appendChild(countTd);
-
-    const actTd = document.createElement('td');
-    actTd.style.textAlign = 'right';
-
-    const editBtn = document.createElement('button');
-    editBtn.className = 'action-link edit-btn';
-    editBtn.textContent = 'Изменить';
-    editBtn.onclick = () => openEditTagModal(tag.id, tag.name);
-    actTd.appendChild(editBtn);
-
-    const delBtn = document.createElement('button');
-    delBtn.className = 'action-link delete-btn';
-    delBtn.style.marginLeft = '8px';
-    delBtn.textContent = 'Удалить';
-    delBtn.onclick = () => deleteTag(tag.id);
-    actTd.appendChild(delBtn);
-
-    row.appendChild(actTd);
-    fragment.appendChild(row);
+  const filteredTags = allTags.filter(tag => {
+    if (!tagSearchFilterQuery) return true;
+    return tag.name.toLowerCase().includes(tagSearchFilterQuery);
   });
+
+  if (filteredTags.length === 0) {
+    const emptyRow = document.createElement('tr');
+    const emptyTd = document.createElement('td');
+    emptyTd.colSpan = 3;
+    emptyTd.style.textAlign = 'center';
+    emptyTd.style.padding = '24px';
+    emptyTd.style.color = '#71717a';
+    emptyTd.textContent = tagSearchFilterQuery ? 'Теги не найдены' : 'Нет созданных тегов';
+    emptyRow.appendChild(emptyTd);
+    fragment.appendChild(emptyRow);
+  } else {
+    filteredTags.forEach(tag => {
+      const usageCount = allItems.filter(it => {
+        const arr = it.tags ? JSON.parse(it.tags) : [];
+        return arr.includes(tag.name);
+      }).length;
+
+      const row = document.createElement('tr');
+      
+      const nameTd = document.createElement('td');
+      const boldTag = document.createElement('b');
+      boldTag.textContent = tag.name;
+      nameTd.appendChild(boldTag);
+      row.appendChild(nameTd);
+
+      const countTd = document.createElement('td');
+      countTd.textContent = `${usageCount} записей`;
+      row.appendChild(countTd);
+
+      const actTd = document.createElement('td');
+      actTd.style.textAlign = 'right';
+
+      const editBtn = document.createElement('button');
+      editBtn.className = 'action-link edit-btn';
+      editBtn.textContent = 'Изменить';
+      editBtn.onclick = () => openEditTagModal(tag.id, tag.name);
+      actTd.appendChild(editBtn);
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'action-link delete-btn';
+      delBtn.style.marginLeft = '8px';
+      delBtn.textContent = 'Удалить';
+      delBtn.onclick = () => deleteTag(tag.id);
+      actTd.appendChild(delBtn);
+
+      row.appendChild(actTd);
+      fragment.appendChild(row);
+    });
+  }
 
   tagsTableBody.innerHTML = '';
   tagsTableBody.appendChild(fragment);
@@ -952,6 +1111,7 @@ tagCreateForm.onsubmit = async (e) => {
     input.value = '';
     allTags = await window.api.getTags();
     renderTagsTable();
+    populateTagFilterSelect();
   } catch (err) {
     alert('Тег с таким именем уже существует!');
   }
@@ -983,6 +1143,7 @@ editTagForm.onsubmit = async (e) => {
     closeEditTagModal();
     [allTags, allItems] = await Promise.all([window.api.getTags(), window.api.getItems()]);
     renderTagsTable();
+    populateTagFilterSelect();
     renderCatalog();
     if (openedItemId) openDetailPage(openedItemId);
   } catch (err) {
@@ -995,6 +1156,7 @@ window.deleteTag = async (id) => {
     await window.api.deleteTag(Number(id));
     [allTags, allItems] = await Promise.all([window.api.getTags(), window.api.getItems()]);
     renderTagsTable();
+    populateTagFilterSelect();
     renderCatalog();
     if (openedItemId) openDetailPage(openedItemId);
   }
@@ -1031,18 +1193,145 @@ sortSelect.onchange = (e) => {
   renderCatalog();
 };
 
+if (tagFilterSelect) {
+  tagFilterSelect.onchange = (e) => {
+    const val = e.target.value;
+    if (val) {
+      window.setTagFilter(val);
+    } else {
+      window.clearTagFilter();
+      if (viewDetail.classList.contains('active')) closeDetailPage();
+    }
+  };
+}
+
 window.setTagFilter = (tag) => {
   activeTag = tag;
-  tagNameSpan.textContent = tag;
-  activeTagPill.classList.remove('hidden');
+  if (tagFilterSelect) {
+    tagFilterSelect.value = tag;
+  }
   if (viewDetail.classList.contains('active')) closeDetailPage();
   renderCatalog();
 };
 
-clearTagBtn.onclick = () => {
+window.clearTagFilter = () => {
   activeTag = null;
-  activeTagPill.classList.add('hidden');
+  if (tagFilterSelect) {
+    tagFilterSelect.value = '';
+  }
   renderCatalog();
 };
+
+// Навигация кнопками мыши (Назад / Вперед)
+function handleNavigateBack() {
+  const now = Date.now();
+  if (now - lastNavTime < 220) return;
+  lastNavTime = now;
+
+  // 1. Закрытие открытых модальных окон
+  if (!mediaModal.classList.contains('hidden')) {
+    closeMediaModal();
+    return;
+  }
+  if (!collectionModal.classList.contains('hidden')) {
+    closeColModal();
+    return;
+  }
+  if (!editTagModal.classList.contains('hidden')) {
+    closeEditTagModal();
+    return;
+  }
+
+  // 2. Возврат из карточки просмотра в каталог
+  if (viewDetail.classList.contains('active')) {
+    closeDetailPage();
+    return;
+  }
+
+  // 3. Возврат из раздела управления тегами в каталог
+  if (viewTags.classList.contains('active')) {
+    tabCatalogBtn.click();
+    return;
+  }
+
+  // 4. Сброс фильтра по тегу в каталоге
+  if (activeTag) {
+    window.clearTagFilter();
+    return;
+  }
+
+  // 5. Сброс фильтра по подборке
+  if (currentCollectionFilter !== null) {
+    currentCollectionFilter = null;
+    renderCollectionsSidebar();
+    renderCatalog();
+    return;
+  }
+
+  // 6. Сброс фильтра избранного
+  if (filterOnlyFavorites) {
+    favFilterBtn.click();
+    return;
+  }
+
+  // 7. Сброс типа медиа в «Все»
+  if (currentFilterType !== 'all') {
+    const allBtn = document.querySelector('#media-types-filter .nav-item[data-type="all"]');
+    if (allBtn) allBtn.click();
+    return;
+  }
+}
+
+function handleNavigateForward() {
+  const now = Date.now();
+  if (now - lastNavTime < 220) return;
+  lastNavTime = now;
+
+  // Если мы на главной странице каталога и ранее смотрели карточку — открываем её снова
+  if (viewCatalog.classList.contains('active') && lastViewedItemId) {
+    openDetailPage(lastViewedItemId);
+  }
+}
+
+// Перехват кликов дополнительных боковых кнопок мыши (3 = Back, 4 = Forward)
+window.addEventListener('mouseup', (e) => {
+  if (e.button === 3) {
+    e.preventDefault();
+    e.stopPropagation();
+    handleNavigateBack();
+  } else if (e.button === 4) {
+    e.preventDefault();
+    e.stopPropagation();
+    handleNavigateForward();
+  }
+});
+
+// Предотвращение стандартного поведения браузера на нажатие
+window.addEventListener('mousedown', (e) => {
+  if (e.button === 3 || e.button === 4) {
+    e.preventDefault();
+  }
+});
+
+// Горячие клавиши (Esc / Alt + Стрелки)
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    handleNavigateBack();
+  } else if (e.altKey && e.key === 'ArrowLeft') {
+    e.preventDefault();
+    handleNavigateBack();
+  } else if (e.altKey && e.key === 'ArrowRight') {
+    e.preventDefault();
+    handleNavigateForward();
+  }
+});
+
+// IPC-события от Electron (Windows WM_APPCOMMAND от драйверов мыши)
+if (window.api && window.api.onNavBack) {
+  window.api.onNavBack(handleNavigateBack);
+}
+if (window.api && window.api.onNavForward) {
+  window.api.onNavForward(handleNavigateForward);
+}
 
 init();

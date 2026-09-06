@@ -15,5 +15,10 @@ contextBridge.exposeInMainWorld('api', {
 
   getCollections: () => ipcRenderer.invoke('get-collections'),
   createCollection: (name) => ipcRenderer.invoke('create-collection', name),
-  deleteCollection: (id) => ipcRenderer.invoke('delete-collection', id)
+  deleteCollection: (id) => ipcRenderer.invoke('delete-collection', id),
+
+  getStatusHistory: (itemId) => ipcRenderer.invoke('get-status-history', itemId),
+
+  onNavBack: (cb) => ipcRenderer.on('nav-back', () => cb()),
+  onNavForward: (cb) => ipcRenderer.on('nav-forward', () => cb())
 });

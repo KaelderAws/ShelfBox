@@ -38,7 +38,7 @@
         <span>Все</span>
       </button>
       <button class="nav-item" data-type="game">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4m-2-2v4m7-2h.01m3 0h.01"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 11h4M8 9v4"/><line x1="15" y1="12" x2="15.01" y2="12"/><line x1="18" y1="10" x2="18.01" y2="10"/><path d="M17.3 5H6.7A4 4 0 0 0 2.7 8.6L2 15a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.4-1.4A2 2 0 0 1 9.8 15h4.4a2 2 0 0 1 1.4.6L17 17c.5.5 1 1 2 1a3 3 0 0 0 3-3l-.7-6.4A4 4 0 0 0 17.3 5z"/></svg>
         <span>Игры</span>
       </button>
       <button class="nav-item" data-type="movie">
@@ -49,17 +49,21 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
         <span>Сериалы</span>
       </button>
+      <button class="nav-item" data-type="anime">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z"/><path d="M5 3v4M3 5h4M19 17v4M17 19h4"/></svg>
+        <span>Аниме</span>
+      </button>
       <button class="nav-item" data-type="book">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
         <span>Книги</span>
       </button>
-      <button class="nav-item" data-type="anime">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>
-        <span>Аниме</span>
+      <button class="nav-item" data-type="comics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="13" y2="13"/></svg>
+        <span>Комиксы</span>
       </button>
-      <button class="nav-item" data-type="boardgame">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><circle cx="15.5" cy="8.5" r="1.5"/><circle cx="15.5" cy="15.5" r="1.5"/><circle cx="8.5" cy="15.5" r="1.5"/></svg>
-        <span>Настолки</span>
+      <button class="nav-item" data-type="manga">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M14 2v7l-2.5-1.5L9 9V2"/></svg>
+        <span>Манга</span>
       </button>
     </div>
 
@@ -89,7 +93,14 @@
       <header class="top-bar">
         <div class="search-wrap">
           <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="search-input" placeholder="Поиск по названию или тексту...">
+          <input type="text" id="search-input" placeholder="Поиск по названию, тегам, описанию...">
+        </div>
+
+        <div class="controls-group">
+          <label class="inline-label">Тег:</label>
+          <select id="tag-filter-select">
+            <option value="">Все теги</option>
+          </select>
         </div>
 
         <div class="controls-group">
@@ -112,11 +123,6 @@
           <button type="button" id="view-mode-list" class="view-mode-btn" title="Список">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
           </button>
-        </div>
-
-        <div id="active-tag-filter" class="active-tag-pill hidden">
-          <span>Тег: <b id="tag-name"></b></span>
-          <button id="clear-tag-btn">✕</button>
         </div>
       </header>
 
@@ -172,6 +178,11 @@
               <span class="detail-sec-label">Заметки</span>
               <div id="detail-notes" class="detail-notes-card"></div>
             </div>
+
+            <div class="detail-section">
+              <span class="detail-sec-label">История статусов</span>
+              <div id="detail-status-history" class="status-history-timeline"></div>
+            </div>
           </div>
         </div>
       </main>
@@ -181,10 +192,13 @@
     <section id="view-tags" class="view-panel">
       <header class="tags-header">
         <h2>Управление тегами</h2>
-        <form id="tag-create-form" class="tag-create-form">
-          <input type="text" id="new-tag-name" required placeholder="Название тега">
-          <button type="submit" class="primary-btn">Создать тег</button>
-        </form>
+        <div class="tags-header-controls">
+          <input type="text" id="tags-search-input" class="tags-search-bar" placeholder="🔍 Поиск среди тегов...">
+          <form id="tag-create-form" class="tag-create-form">
+            <input type="text" id="new-tag-name" required placeholder="Название нового тега">
+            <button type="submit" class="primary-btn">Создать тег</button>
+          </form>
+        </div>
       </header>
 
       <div class="tags-manager-container">
@@ -231,45 +245,13 @@
           </div>
 
           <div class="fields-container">
-            <div class="form-row">
-              <div class="flex-2">
-                <label>Название *</label>
-                <input type="text" id="title">
+            <!-- Строка 1: Название и Избранное -->
+            <div class="form-row title-fav-row">
+              <div class="field-title-wrap">
+                <label for="title">Название <span class="required-star">*</span></label>
+                <input type="text" id="title" placeholder="Введите название...">
               </div>
-              <div>
-                <label>Тип медиа</label>
-                <select id="media_type">
-                  <option value="game">Игра</option>
-                  <option value="movie">Фильм</option>
-                  <option value="series">Сериал</option>
-                  <option value="book">Книга</option>
-                  <option value="anime">Аниме</option>
-                  <option value="boardgame">Настолка</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Звёзды, статус и Избранное -->
-            <div class="form-row rating-status-row">
-              <div class="flex-2">
-                <label>Оценка</label>
-                <div class="star-rating-widget" id="star-picker">
-                  <div class="stars-track" id="stars-track"></div>
-                  <span id="star-score-label" class="star-score-label">Нет оценки</span>
-                  <button type="button" id="clear-rating-btn" class="clear-star-btn" title="Сбросить оценку">✕</button>
-                </div>
-              </div>
-              <div>
-                <label>Статус</label>
-                <select id="status">
-                  <option value="Запланировано">Запланировано</option>
-                  <option value="В процессе">В процессе</option>
-                  <option value="Завершено">Завершено</option>
-                  <option value="Брошено">Брошено</option>
-                </select>
-              </div>
-              <div class="fav-heart-wrap">
-                <label>Избранное</label>
+              <div class="field-fav-wrap">
                 <button type="button" id="fav-heart-btn" class="heart-toggle-btn" title="В избранное">
                   <svg viewBox="0 0 24 24" class="heart-icon">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
@@ -278,21 +260,62 @@
               </div>
             </div>
 
-            <div>
-              <label>Выбрать теги</label>
-              <div id="modal-tags-picker" class="tags-picker"></div>
+            <!-- Строка 2: Тип медиа, Статус и Оценка -->
+            <div class="form-row meta-triplet-row">
+              <div class="meta-col">
+                <label for="media_type">Тип медиа</label>
+                <select id="media_type" class="modal-select">
+                  <option value="game">Игра</option>
+                  <option value="movie">Фильм</option>
+                  <option value="series">Сериал</option>
+                  <option value="anime">Аниме</option>
+                  <option value="book">Книга</option>
+                  <option value="comics">Комиксы</option>
+                  <option value="manga">Манга</option>
+                </select>
+              </div>
+              <div class="meta-col">
+                <label for="status">Статус</label>
+                <select id="status" class="modal-select">
+                  <option value="Запланировано">Запланировано</option>
+                  <option value="В процессе">В процессе</option>
+                  <option value="Завершено">Завершено</option>
+                  <option value="Брошено">Брошено</option>
+                </select>
+              </div>
+              <div class="meta-col rating-col">
+                <label>Оценка</label>
+                <div class="star-rating-widget" id="star-picker">
+                  <div class="stars-track" id="stars-track"></div>
+                  <span id="star-score-label" class="star-score-label">Нет оценки</span>
+                  <button type="button" id="clear-rating-btn" class="clear-star-btn" title="Сбросить оценку">✕</button>
+                </div>
+              </div>
             </div>
 
-            <div>
-              <label>Добавить в подборки</label>
-              <div id="modal-collections-picker" class="collections-picker"></div>
+            <!-- Строка 3: Теги и Подборки в 2 колонки -->
+            <div class="form-row tags-collections-row">
+              <div class="half-col">
+                <label>Выбрать теги</label>
+                <div id="modal-tags-picker" class="tags-picker"></div>
+              </div>
+              <div class="half-col">
+                <label>Добавить в подборки</label>
+                <div id="modal-collections-picker" class="collections-picker"></div>
+              </div>
             </div>
 
-            <label>Описание / Синопсис</label>
-            <textarea id="description" rows="2"></textarea>
+            <!-- Строка 4: Описание / Синопсис -->
+            <div class="field-block">
+              <label for="description">Описание / Синопсис</label>
+              <textarea id="description" rows="2" placeholder="Краткий сюжет, синопсис или аннотация..."></textarea>
+            </div>
 
-            <label>Личные комментарии</label>
-            <textarea id="notes" rows="3"></textarea>
+            <!-- Строка 5: Личные комментарии -->
+            <div class="field-block">
+              <label for="notes">Личные комментарии</label>
+              <textarea id="notes" rows="2" placeholder="Личные мысли, впечатления, заметки..."></textarea>
+            </div>
           </div>
         </div>
 
