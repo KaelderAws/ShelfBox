@@ -36,6 +36,14 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
         <span>Каталог</span>
       </button>
+      <button class="nav-item" id="tab-stats-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+        <span>Статистика</span>
+      </button>
+      <button class="nav-item" id="tab-genres-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h10M4 18h7"/></svg>
+        <span>Жанры</span>
+      </button>
       <button class="nav-item" id="tab-tags-btn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
         <span>Теги</span>
@@ -108,6 +116,13 @@
         </div>
 
         <div class="controls-group">
+          <label class="inline-label">Жанр:</label>
+          <select id="genre-filter-select">
+            <option value="">Все жанры</option>
+          </select>
+        </div>
+
+        <div class="controls-group">
           <label class="inline-label">Тег:</label>
           <select id="tag-filter-select">
             <option value="">Все теги</option>
@@ -171,6 +186,11 @@
             </div>
 
             <div class="detail-section">
+              <span class="detail-sec-label">Жанры</span>
+              <div id="detail-genres-list" class="tags"></div>
+            </div>
+
+            <div class="detail-section">
               <span class="detail-sec-label">Теги</span>
               <div id="detail-tags-list" class="tags"></div>
             </div>
@@ -197,6 +217,160 @@
           </div>
         </div>
       </main>
+    </section>
+
+    <!-- Раздел статистики -->
+    <section id="view-stats" class="view-panel">
+      <header class="stats-header">
+        <div class="stats-header-title">
+          <h2>Статистика и аналитика</h2>
+        </div>
+        <div class="stats-header-controls">
+          <label class="inline-label">Срез по типу:</label>
+          <select id="stats-type-filter">
+            <option value="all">Все типы медиа</option>
+            <option value="game">Игры</option>
+            <option value="movie">Фильмы</option>
+            <option value="series">Сериалы</option>
+            <option value="anime">Аниме</option>
+            <option value="book">Книги</option>
+            <option value="comics">Комиксы</option>
+            <option value="manga">Манга</option>
+          </select>
+        </div>
+      </header>
+
+      <div class="stats-container">
+        <!-- KPI метрики -->
+        <div class="stats-kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">Всего медиа</div>
+            <div class="kpi-value" id="stats-kpi-total">0</div>
+            <div class="kpi-sub" id="stats-kpi-total-sub">в коллекции</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">В процессе</div>
+            <div class="kpi-value text-progress" id="stats-kpi-progress">0</div>
+            <div class="kpi-sub" id="stats-kpi-progress-sub">0% от общего</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Завершено</div>
+            <div class="kpi-value text-completed" id="stats-kpi-completed">0</div>
+            <div class="kpi-sub" id="stats-kpi-completed-sub">0% завершено</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Запланировано</div>
+            <div class="kpi-value text-planned" id="stats-kpi-planned">0</div>
+            <div class="kpi-sub" id="stats-kpi-planned-sub">0% в планах</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Брошено</div>
+            <div class="kpi-value text-dropped" id="stats-kpi-dropped">0</div>
+            <div class="kpi-sub" id="stats-kpi-dropped-sub">0% от общего</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Средняя оценка</div>
+            <div class="kpi-value text-rating" id="stats-kpi-rating">—</div>
+            <div class="kpi-sub" id="stats-kpi-rating-sub">0 с оценкой</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">В избранном</div>
+            <div class="kpi-value text-fav" id="stats-kpi-fav">0</div>
+            <div class="kpi-sub" id="stats-kpi-fav-sub">0% избранных</div>
+          </div>
+        </div>
+
+        <!-- Сетка визуализаций и графиков -->
+        <div class="stats-charts-grid">
+          <!-- Статусы распределение -->
+          <div class="stats-card">
+            <div class="stats-card-header">
+              <h3>Распределение по статусам</h3>
+            </div>
+            <div class="stats-card-body">
+              <div id="stats-status-bar" class="stacked-bar-track"></div>
+              <div id="stats-status-legend" class="stats-legend-grid"></div>
+            </div>
+          </div>
+
+          <!-- Типы медиа распределение -->
+          <div class="stats-card" id="stats-types-card">
+            <div class="stats-card-header">
+              <h3>Категории медиа</h3>
+            </div>
+            <div class="stats-card-body">
+              <div id="stats-types-list" class="stats-bars-list"></div>
+            </div>
+          </div>
+
+          <!-- Распределение оценок -->
+          <div class="stats-card">
+            <div class="stats-card-header">
+              <h3>Распределение оценок</h3>
+            </div>
+            <div class="stats-card-body">
+              <div id="stats-rating-histogram" class="stats-histogram-wrap"></div>
+            </div>
+          </div>
+
+          <!-- Топ жанров -->
+          <div class="stats-card">
+            <div class="stats-card-header">
+              <h3>Популярные жанры</h3>
+            </div>
+            <div class="stats-card-body">
+              <div id="stats-genres-list" class="stats-rank-list"></div>
+            </div>
+          </div>
+
+          <!-- Топ тегов -->
+          <div class="stats-card">
+            <div class="stats-card-header">
+              <h3>Популярные теги</h3>
+            </div>
+            <div class="stats-card-body">
+              <div id="stats-tags-list" class="stats-rank-list"></div>
+            </div>
+          </div>
+
+          <!-- Топ высоко оцененных -->
+          <div class="stats-card">
+            <div class="stats-card-header">
+              <h3>Лучшие по оценке</h3>
+            </div>
+            <div class="stats-card-body">
+              <div id="stats-top-rated-list" class="stats-top-media-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Менеджер жанров -->
+    <section id="view-genres" class="view-panel">
+      <header class="tags-header">
+        <h2>Управление жанрами</h2>
+        <div class="tags-header-controls">
+          <input type="text" id="genres-search-input" class="tags-search-bar" placeholder="Поиск среди жанров...">
+          <form id="genre-create-form" class="tag-create-form">
+            <input type="text" id="new-genre-name" required placeholder="Название нового жанра">
+            <button type="submit" class="primary-btn">Создать жанр</button>
+          </form>
+        </div>
+      </header>
+
+      <div class="tags-manager-container">
+        <table class="tags-table">
+          <thead>
+            <tr>
+              <th>Название жанра</th>
+              <th>Использование</th>
+              <th style="text-align: right;">Действия</th>
+            </tr>
+          </thead>
+          <tbody id="genres-table-body"></tbody>
+        </table>
+      </div>
     </section>
 
     <!-- Менеджер тегов -->
@@ -304,14 +478,18 @@
               </div>
             </div>
 
-            <!-- Строка 3: Теги и Подборки в 2 колонки -->
-            <div class="form-row tags-collections-row">
-              <div class="half-col">
-                <label>Выбрать теги</label>
+            <!-- Строка 3: Жанры, Теги и Подборки в 3 колонки -->
+            <div class="form-row pickers-triplet-row">
+              <div class="triplet-col">
+                <label>Жанры</label>
+                <div id="modal-genres-picker" class="tags-picker"></div>
+              </div>
+              <div class="triplet-col">
+                <label>Теги</label>
                 <div id="modal-tags-picker" class="tags-picker"></div>
               </div>
-              <div class="half-col">
-                <label>Добавить в подборки</label>
+              <div class="triplet-col">
+                <label>Подборки</label>
                 <div id="modal-collections-picker" class="collections-picker"></div>
               </div>
             </div>
@@ -373,6 +551,27 @@
         <input type="text" id="edit-tag-name-input" required placeholder="Название тега">
         <div class="modal-actions">
           <button type="button" id="close-edit-tag-modal-btn" class="secondary-btn">Отмена</button>
+          <button type="submit" class="primary-btn">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Модалка редактирования жанра -->
+  <div id="edit-genre-modal" class="modal hidden">
+    <div class="modal-content modal-small">
+      <div class="modal-header">
+        <h2>Переименовать жанр</h2>
+        <button type="button" class="close-btn" id="close-edit-genre-modal-x">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="edit-genre-form">
+        <input type="hidden" id="edit-genre-id">
+        <label>Новое имя жанра</label>
+        <input type="text" id="edit-genre-name-input" required placeholder="Название жанра">
+        <div class="modal-actions">
+          <button type="button" id="close-edit-genre-modal-btn" class="secondary-btn">Отмена</button>
           <button type="submit" class="primary-btn">Сохранить</button>
         </div>
       </form>

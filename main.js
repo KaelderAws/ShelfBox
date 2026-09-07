@@ -95,6 +95,11 @@ db.exec(`
     name TEXT UNIQUE NOT NULL
   );
 
+  CREATE TABLE IF NOT EXISTS genres (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT UNIQUE NOT NULL
+  );
+
   CREATE TABLE IF NOT EXISTS collections (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT UNIQUE NOT NULL
@@ -119,6 +124,16 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_status_history_item ON status_history(item_id);
 `);
 
+// Миграция колонки genres для существующих баз данных
+try {
+  const itemColumns = db.pragma('table_info(items)');
+  if (!itemColumns.some(c => c.name === 'genres')) {
+    db.exec('ALTER TABLE items ADD COLUMN genres TEXT;');
+  }
+} catch (e) {
+  console.warn('Ошибка миграции столбца genres:', e);
+}
+
 // Миграция старых записей настолок в комиксы
 try {
   db.exec("UPDATE items SET media_type = 'comics' WHERE media_type = 'boardgame'");
@@ -138,8 +153,8 @@ const stmts = {
   getAllItems: db.prepare('SELECT * FROM items ORDER BY is_favorite DESC, id DESC'),
   getItemCollections: db.prepare('SELECT collection_id FROM item_collections WHERE item_id = ?'),
   insertItem: db.prepare(`
-    INSERT INTO items (title, media_type, cover_path, rating, status, is_favorite, tags, description, notes)
-    VALUES (@title, @media_type, @cover_path, @rating, @status, @is_favorite, @tags, @description, @notes)
+    INSERT INTO items (title, media_type, cover_path, rating, status, is_favorite, tags, genres, description, notes)
+    VALUES (@title, @media_type, @cover_path, @rating, @status, @is_favorite, @tags, @genres, @description, @notes)
   `),
   updateItem: db.prepare(`
     UPDATE items SET
@@ -150,6 +165,7 @@ const stmts = {
       status = @status,
       is_favorite = @is_favorite,
       tags = @tags,
+      genres = @genres,
       description = @description,
       notes = @notes
     WHERE id = @id
@@ -174,6 +190,14 @@ const stmts = {
   deleteTag: db.prepare('DELETE FROM tags WHERE id = ?'),
   getItemsWithTag: db.prepare('SELECT id, tags FROM items WHERE tags LIKE ?'),
   updateItemTags: db.prepare('UPDATE items SET tags = ? WHERE id = ?'),
+
+  getAllGenres: db.prepare('SELECT id, name FROM genres ORDER BY name ASC'),
+  getGenreById: db.prepare('SELECT name FROM genres WHERE id = ?'),
+  insertGenre: db.prepare('INSERT INTO genres (name) VALUES (?)'),
+  updateGenre: db.prepare('UPDATE genres SET name = ? WHERE id = ?'),
+  deleteGenre: db.prepare('DELETE FROM genres WHERE id = ?'),
+  getItemsWithGenre: db.prepare('SELECT id, genres FROM items WHERE genres LIKE ?'),
+  updateItemGenres: db.prepare('UPDATE items SET genres = ? WHERE id = ?'),
 
   getAllCollections: db.prepare('SELECT * FROM collections ORDER BY name ASC'),
   insertCollection: db.prepare('INSERT INTO collections (name) VALUES (?)'),
@@ -221,7 +245,9 @@ function removeCoverFile(coverPath) {
 const addItemTx = db.transaction((item) => {
   const itemToSave = {
     ...item,
-    cover_path: normalizeCoverPath(item.cover_path)
+    cover_path: normalizeCoverPath(item.cover_path),
+    genres: item.genres || '[]',
+    tags: item.tags || '[]'
   };
   const info = stmts.insertItem.run(itemToSave);
   const itemId = info.lastInsertRowid;
@@ -253,7 +279,9 @@ const updateItemTx = db.transaction((item) => {
 
   const itemToSave = {
     ...item,
-    cover_path: newNormalizedCover
+    cover_path: newNormalizedCover,
+    genres: item.genres || '[]',
+    tags: item.tags || '[]'
   };
   stmts.updateItem.run(itemToSave);
   stmts.unlinkCollections.run(item.id);
@@ -299,6 +327,33 @@ const deleteTagTx = db.transaction((id) => {
     }
   }
   return stmts.deleteTag.run(id);
+});
+
+const updateGenreTx = db.transaction(({ id, name }) => {
+  const oldGenre = stmts.getGenreById.get(id);
+  if (!oldGenre) return;
+  stmts.updateGenre.run(name, id);
+  if (oldGenre.name !== name) {
+    const items = stmts.getItemsWithGenre.all(`%"${oldGenre.name}"%`);
+    for (const it of items) {
+      let current = JSON.parse(it.genres || '[]');
+      current = current.map(g => g === oldGenre.name ? name : g);
+      stmts.updateItemGenres.run(JSON.stringify(current), it.id);
+    }
+  }
+});
+
+const deleteGenreTx = db.transaction((id) => {
+  const genre = stmts.getGenreById.get(id);
+  if (genre) {
+    const items = stmts.getItemsWithGenre.all(`%"${genre.name}"%`);
+    for (const it of items) {
+      let current = JSON.parse(it.genres || '[]');
+      current = current.filter(g => g !== genre.name);
+      stmts.updateItemGenres.run(JSON.stringify(current), it.id);
+    }
+  }
+  return stmts.deleteGenre.run(id);
 });
 
 const deleteCollectionTx = db.transaction((id) => {
@@ -387,6 +442,11 @@ ipcMain.handle('get-tags', () => stmts.getAllTags.all());
 ipcMain.handle('create-tag', (event, name) => stmts.insertTag.run(name));
 ipcMain.handle('update-tag', (event, tag) => updateTagTx(tag));
 ipcMain.handle('delete-tag', (event, id) => deleteTagTx(id));
+
+ipcMain.handle('get-genres', () => stmts.getAllGenres.all());
+ipcMain.handle('create-genre', (event, name) => stmts.insertGenre.run(name));
+ipcMain.handle('update-genre', (event, genre) => updateGenreTx(genre));
+ipcMain.handle('delete-genre', (event, id) => deleteGenreTx(id));
 
 ipcMain.handle('get-collections', () => stmts.getAllCollections.all());
 ipcMain.handle('create-collection', (event, name) => stmts.insertCollection.run(name));

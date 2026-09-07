@@ -1,11 +1,13 @@
 let allItems = [];
 let allTags = [];
+let allGenres = [];
 let allCollections = [];
 
 let currentFilterType = 'all';
 let currentCollectionFilter = null;
 let filterOnlyFavorites = false;
 let activeTag = null;
+let activeGenre = null;
 let searchQuery = '';
 let currentSort = 'date-desc';
 let currentViewMode = localStorage.getItem('shelfbox_view_mode') || 'grid'; // 'grid' или 'list'
@@ -15,11 +17,13 @@ let lastViewedItemId = null;
 let lastNavTime = 0;
 
 let selectedTagsForModal = [];
+let selectedGenresForModal = [];
 let selectedCollectionsForModal = [];
 let currentCoverPath = null;
 let selectedRating = null; // 1-10
 let isFavoriteInModal = false;
 let searchDebounceTimer = null;
+let statsCurrentMediaType = 'all';
 
 // Элементы
 const catalog = document.getElementById('catalog');
@@ -31,7 +35,12 @@ const mediaForm = document.getElementById('media-form');
 const viewCatalog = document.getElementById('view-catalog');
 const viewDetail = document.getElementById('view-detail');
 const viewTags = document.getElementById('view-tags');
+const viewGenres = document.getElementById('view-genres');
+const viewStats = document.getElementById('view-stats');
+
 const tabCatalogBtn = document.getElementById('tab-catalog-btn');
+const tabStatsBtn = document.getElementById('tab-stats-btn');
+const tabGenresBtn = document.getElementById('tab-genres-btn');
 const tabTagsBtn = document.getElementById('tab-tags-btn');
 
 const viewModeGridBtn = document.getElementById('view-mode-grid');
@@ -43,6 +52,7 @@ const detailCoverContainer = document.getElementById('detail-cover-container');
 const detailTypePill = document.getElementById('detail-type-pill');
 const detailStatusPill = document.getElementById('detail-status-pill');
 const detailRatingPill = document.getElementById('detail-rating-pill');
+const detailGenresList = document.getElementById('detail-genres-list');
 const detailTagsList = document.getElementById('detail-tags-list');
 const detailCollectionsList = document.getElementById('detail-collections-list');
 const detailDescription = document.getElementById('detail-description');
@@ -65,6 +75,13 @@ const editTagNameInput = document.getElementById('edit-tag-name-input');
 const closeEditTagModalBtn = document.getElementById('close-edit-tag-modal-btn');
 const closeEditTagModalX = document.getElementById('close-edit-tag-modal-x');
 
+const editGenreModal = document.getElementById('edit-genre-modal');
+const editGenreForm = document.getElementById('edit-genre-form');
+const editGenreIdInput = document.getElementById('edit-genre-id');
+const editGenreNameInput = document.getElementById('edit-genre-name-input');
+const closeEditGenreModalBtn = document.getElementById('close-edit-genre-modal-btn');
+const closeEditGenreModalX = document.getElementById('close-edit-genre-modal-x');
+
 const starsTrack = document.getElementById('stars-track');
 const starScoreLabel = document.getElementById('star-score-label');
 const clearRatingBtn = document.getElementById('clear-rating-btn');
@@ -81,9 +98,11 @@ const dropPlaceholder = document.getElementById('drop-placeholder');
 const searchInput = document.getElementById('search-input');
 const sortSelect = document.getElementById('sort-select');
 const tagFilterSelect = document.getElementById('tag-filter-select');
+const genreFilterSelect = document.getElementById('genre-filter-select');
 const favFilterBtn = document.getElementById('filter-favorites');
 const collectionsList = document.getElementById('collections-list');
 const modalTagsPicker = document.getElementById('modal-tags-picker');
+const modalGenresPicker = document.getElementById('modal-genres-picker');
 const modalCollectionsPicker = document.getElementById('modal-collections-picker');
 
 const detailStatusHistory = document.getElementById('detail-status-history');
@@ -95,6 +114,13 @@ const tagCreateForm = document.getElementById('tag-create-form');
 const tagsTableBody = document.getElementById('tags-table-body');
 const tagsSearchInput = document.getElementById('tags-search-input');
 let tagSearchFilterQuery = '';
+
+const genreCreateForm = document.getElementById('genre-create-form');
+const genresTableBody = document.getElementById('genres-table-body');
+const genresSearchInput = document.getElementById('genres-search-input');
+let genreSearchFilterQuery = '';
+
+const statsTypeFilter = document.getElementById('stats-type-filter');
 
 const STAR_PATH = 'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z';
 const HEART_PATH = 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z';
@@ -150,12 +176,14 @@ function initTheme() {
 
 async function init() {
   initTheme();
-  [allItems, allTags, allCollections] = await Promise.all([
+  [allItems, allTags, allGenres, allCollections] = await Promise.all([
     window.api.getItems(),
     window.api.getTags(),
+    window.api.getGenres(),
     window.api.getCollections()
   ]);
   populateTagFilterSelect();
+  populateGenreFilterSelect();
   buildStarRatingWidget();
   initHeartButton();
   updateViewModeToggle();
@@ -342,7 +370,15 @@ function renderCatalog() {
         } catch (e) {}
       }
 
-      matchSearch = titleMatch || descMatch || notesMatch || tagMatch;
+      let genreMatch = false;
+      if (item.genres && q) {
+        try {
+          const genresArr = JSON.parse(item.genres);
+          genreMatch = genresArr.some(g => g.toLowerCase().includes(q));
+        } catch (e) {}
+      }
+
+      matchSearch = titleMatch || descMatch || notesMatch || tagMatch || genreMatch;
     }
 
     let matchTag = true;
@@ -351,7 +387,13 @@ function renderCatalog() {
       matchTag = itemTags.includes(activeTag);
     }
 
-    return matchType && matchFav && matchCollection && matchSearch && matchTag;
+    let matchGenre = true;
+    if (activeGenre) {
+      const itemGenres = item.genres ? JSON.parse(item.genres) : [];
+      matchGenre = itemGenres.includes(activeGenre);
+    }
+
+    return matchType && matchFav && matchCollection && matchSearch && matchTag && matchGenre;
   });
 
   filtered.sort((a, b) => {
@@ -575,6 +617,26 @@ function openDetailPage(id) {
     closeDetailPage();
   };
 
+  // Жанры
+  const genresArr = item.genres ? JSON.parse(item.genres) : [];
+  if (detailGenresList) {
+    detailGenresList.innerHTML = '';
+    if (genresArr.length > 0) {
+      genresArr.forEach(gName => {
+        const genreEl = document.createElement('span');
+        genreEl.className = 'tag genre-tag';
+        genreEl.textContent = gName;
+        genreEl.onclick = () => {
+          closeDetailPage();
+          setGenreFilter(gName);
+        };
+        detailGenresList.appendChild(genreEl);
+      });
+    } else {
+      detailGenresList.innerHTML = '<span class="empty-muted-label">Жанры не привязаны</span>';
+    }
+  }
+
   // Теги
   const tagsArr = item.tags ? JSON.parse(item.tags) : [];
   detailTagsList.innerHTML = '';
@@ -635,16 +697,12 @@ function openDetailPage(id) {
   // История статусов
   renderDetailStatusHistory(item.id);
 
-  viewCatalog.classList.remove('active');
-  viewTags.classList.remove('active');
-  viewDetail.classList.add('active');
+  switchView('detail');
 }
 
 function closeDetailPage() {
   openedItemId = null;
-  viewDetail.classList.remove('active');
-  viewCatalog.classList.add('active');
-  tabCatalogBtn.classList.add('active');
+  switchView('catalog');
 }
 
 detailBackBtn.onclick = closeDetailPage;
@@ -841,6 +899,27 @@ async function deleteCollection(id) {
 }
 
 function renderModalPickers() {
+  modalGenresPicker.innerHTML = '';
+  if (!allGenres || allGenres.length === 0) {
+    modalGenresPicker.innerHTML = '<span class="empty-picker-hint">Нет созданных жанров</span>';
+  } else {
+    allGenres.forEach(g => {
+      const isSelected = selectedGenresForModal.includes(g.name);
+      const pill = document.createElement('span');
+      pill.className = `picker-item ${isSelected ? 'selected' : ''}`;
+      pill.textContent = g.name;
+      pill.onclick = () => {
+        if (selectedGenresForModal.includes(g.name)) {
+          selectedGenresForModal = selectedGenresForModal.filter(name => name !== g.name);
+        } else {
+          selectedGenresForModal.push(g.name);
+        }
+        renderModalPickers();
+      };
+      modalGenresPicker.appendChild(pill);
+    });
+  }
+
   modalTagsPicker.innerHTML = '';
   if (!allTags || allTags.length === 0) {
     modalTagsPicker.innerHTML = '<span class="empty-picker-hint">Нет созданных тегов</span>';
@@ -893,6 +972,7 @@ function openAddModal() {
   updateStarWidgetVisuals(null);
   setHeartState(false);
 
+  selectedGenresForModal = [];
   selectedTagsForModal = [];
   selectedCollectionsForModal = [];
   mediaForm.reset();
@@ -931,6 +1011,7 @@ window.openEditModal = (id) => {
     dropPlaceholder.classList.remove('hidden');
   }
 
+  selectedGenresForModal = item.genres ? JSON.parse(item.genres) : [];
   selectedTagsForModal = item.tags ? JSON.parse(item.tags) : [];
   selectedCollectionsForModal = Array.isArray(item.collections) ? item.collections.map(Number) : [];
   renderModalPickers();
@@ -1008,6 +1089,7 @@ mediaForm.onsubmit = async (e) => {
     rating: selectedRating,
     status: document.getElementById('status').value,
     is_favorite: isFavoriteInModal ? 1 : 0,
+    genres: JSON.stringify(selectedGenresForModal),
     tags: JSON.stringify(selectedTagsForModal),
     collections: selectedCollectionsForModal.map(Number),
     description: document.getElementById('description').value.trim(),
@@ -1024,6 +1106,7 @@ mediaForm.onsubmit = async (e) => {
   closeMediaModal();
   allItems = await window.api.getItems();
   renderCatalog();
+  if (viewStats.classList.contains('active')) renderStats();
   if (openedItemId && Number(openedItemId) === Number(id)) {
     openDetailPage(openedItemId);
   }
@@ -1033,6 +1116,7 @@ window.toggleFav = async (id) => {
   await window.api.toggleFavorite(Number(id));
   allItems = await window.api.getItems();
   renderCatalog();
+  if (viewStats.classList.contains('active')) renderStats();
 };
 
 window.deleteItem = async (id) => {
@@ -1040,29 +1124,232 @@ window.deleteItem = async (id) => {
     await window.api.deleteItem(Number(id));
     allItems = await window.api.getItems();
     renderCatalog();
+    if (viewStats.classList.contains('active')) renderStats();
     if (openedItemId && Number(openedItemId) === Number(id)) {
       closeDetailPage();
     }
   }
 };
 
+function switchView(viewName) {
+  viewCatalog.classList.toggle('active', viewName === 'catalog');
+  viewDetail.classList.toggle('active', viewName === 'detail');
+  viewTags.classList.toggle('active', viewName === 'tags');
+  viewGenres.classList.toggle('active', viewName === 'genres');
+  viewStats.classList.toggle('active', viewName === 'stats');
+
+  tabCatalogBtn.classList.toggle('active', viewName === 'catalog' || viewName === 'detail');
+  tabStatsBtn.classList.toggle('active', viewName === 'stats');
+  tabGenresBtn.classList.toggle('active', viewName === 'genres');
+  tabTagsBtn.classList.toggle('active', viewName === 'tags');
+}
+
 tabCatalogBtn.onclick = () => {
-  tabCatalogBtn.classList.add('active');
-  tabTagsBtn.classList.remove('active');
-  viewDetail.classList.remove('active');
-  viewCatalog.classList.add('active');
-  viewTags.classList.remove('active');
+  switchView('catalog');
+};
+
+tabStatsBtn.onclick = () => {
+  switchView('stats');
+  renderStats();
+};
+
+tabGenresBtn.onclick = () => {
+  switchView('genres');
+  renderGenresTable();
 };
 
 tabTagsBtn.onclick = () => {
-  tabTagsBtn.classList.add('active');
-  tabCatalogBtn.classList.remove('active');
-  viewDetail.classList.remove('active');
-  viewTags.classList.add('active');
-  viewCatalog.classList.remove('active');
+  switchView('tags');
   renderTagsTable();
 };
 
+function populateGenreFilterSelect() {
+  if (!genreFilterSelect) return;
+  const currentVal = genreFilterSelect.value;
+  genreFilterSelect.innerHTML = '<option value="">Все жанры</option>';
+  allGenres.forEach(genre => {
+    const opt = document.createElement('option');
+    opt.value = genre.name;
+    opt.textContent = genre.name;
+    genreFilterSelect.appendChild(opt);
+  });
+  if (activeGenre && allGenres.some(g => g.name === activeGenre)) {
+    genreFilterSelect.value = activeGenre;
+  } else if (currentVal && allGenres.some(g => g.name === currentVal)) {
+    genreFilterSelect.value = currentVal;
+  } else {
+    genreFilterSelect.value = '';
+    if (activeGenre && !allGenres.some(g => g.name === activeGenre)) {
+      activeGenre = null;
+    }
+  }
+}
+
+if (genreFilterSelect) {
+  genreFilterSelect.onchange = (e) => {
+    const val = e.target.value;
+    if (val) {
+      window.setGenreFilter(val);
+    } else {
+      window.clearGenreFilter();
+      if (viewDetail.classList.contains('active')) closeDetailPage();
+    }
+  };
+}
+
+window.setGenreFilter = (genre) => {
+  activeGenre = genre;
+  if (genreFilterSelect) {
+    genreFilterSelect.value = genre;
+  }
+  if (viewDetail.classList.contains('active')) closeDetailPage();
+  if (!viewCatalog.classList.contains('active')) switchView('catalog');
+  renderCatalog();
+};
+
+window.clearGenreFilter = () => {
+  activeGenre = null;
+  if (genreFilterSelect) {
+    genreFilterSelect.value = '';
+  }
+  renderCatalog();
+};
+
+// Менеджер жанров
+if (genresSearchInput) {
+  genresSearchInput.oninput = (e) => {
+    genreSearchFilterQuery = e.target.value.toLowerCase().trim();
+    renderGenresTable();
+  };
+}
+
+function renderGenresTable() {
+  const fragment = document.createDocumentFragment();
+
+  const filteredGenres = allGenres.filter(genre => {
+    if (!genreSearchFilterQuery) return true;
+    return genre.name.toLowerCase().includes(genreSearchFilterQuery);
+  });
+
+  if (filteredGenres.length === 0) {
+    const emptyRow = document.createElement('tr');
+    const emptyTd = document.createElement('td');
+    emptyTd.colSpan = 3;
+    emptyTd.style.textAlign = 'center';
+    emptyTd.style.padding = '24px';
+    emptyTd.style.color = '#71717a';
+    emptyTd.textContent = genreSearchFilterQuery ? 'Жанры не найдены' : 'Нет созданных жанров';
+    emptyRow.appendChild(emptyTd);
+    fragment.appendChild(emptyRow);
+  } else {
+    filteredGenres.forEach(genre => {
+      const usageCount = allItems.filter(it => {
+        const arr = it.genres ? JSON.parse(it.genres) : [];
+        return arr.includes(genre.name);
+      }).length;
+
+      const row = document.createElement('tr');
+      
+      const nameTd = document.createElement('td');
+      const boldTag = document.createElement('b');
+      boldTag.textContent = genre.name;
+      nameTd.appendChild(boldTag);
+      row.appendChild(nameTd);
+
+      const countTd = document.createElement('td');
+      countTd.textContent = `${usageCount} записей`;
+      row.appendChild(countTd);
+
+      const actTd = document.createElement('td');
+      actTd.style.textAlign = 'right';
+
+      const editBtn = document.createElement('button');
+      editBtn.className = 'action-link edit-btn';
+      editBtn.textContent = 'Изменить';
+      editBtn.onclick = () => openEditGenreModal(genre.id, genre.name);
+      actTd.appendChild(editBtn);
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'action-link delete-btn';
+      delBtn.style.marginLeft = '8px';
+      delBtn.textContent = 'Удалить';
+      delBtn.onclick = () => deleteGenre(genre.id);
+      actTd.appendChild(delBtn);
+
+      row.appendChild(actTd);
+      fragment.appendChild(row);
+    });
+  }
+
+  genresTableBody.innerHTML = '';
+  genresTableBody.appendChild(fragment);
+}
+
+genreCreateForm.onsubmit = async (e) => {
+  e.preventDefault();
+  const input = document.getElementById('new-genre-name');
+  const name = input.value.trim();
+  if (!name) return;
+
+  try {
+    await window.api.createGenre(name);
+    input.value = '';
+    allGenres = await window.api.getGenres();
+    renderGenresTable();
+    populateGenreFilterSelect();
+  } catch (err) {
+    alert('Жанр с таким именем уже существует!');
+  }
+};
+
+function openEditGenreModal(id, currentName) {
+  editGenreIdInput.value = id;
+  editGenreNameInput.value = currentName;
+  editGenreModal.classList.remove('hidden');
+  editGenreNameInput.focus();
+  editGenreNameInput.select();
+}
+
+function closeEditGenreModal() {
+  editGenreModal.classList.add('hidden');
+}
+
+closeEditGenreModalBtn.onclick = closeEditGenreModal;
+closeEditGenreModalX.onclick = closeEditGenreModal;
+
+editGenreForm.onsubmit = async (e) => {
+  e.preventDefault();
+  const id = Number(editGenreIdInput.value);
+  const newName = editGenreNameInput.value.trim();
+  if (!id || !newName) return;
+
+  try {
+    await window.api.updateGenre({ id, name: newName });
+    closeEditGenreModal();
+    [allGenres, allItems] = await Promise.all([window.api.getGenres(), window.api.getItems()]);
+    renderGenresTable();
+    populateGenreFilterSelect();
+    renderCatalog();
+    if (viewStats.classList.contains('active')) renderStats();
+    if (openedItemId) openDetailPage(openedItemId);
+  } catch (err) {
+    alert('Не удалось изменить жанр или такое имя уже существует.');
+  }
+};
+
+window.deleteGenre = async (id) => {
+  if (confirm('Удалить жанр? Он снимется со всех карточек.')) {
+    await window.api.deleteGenre(Number(id));
+    [allGenres, allItems] = await Promise.all([window.api.getGenres(), window.api.getItems()]);
+    renderGenresTable();
+    populateGenreFilterSelect();
+    renderCatalog();
+    if (viewStats.classList.contains('active')) renderStats();
+    if (openedItemId) openDetailPage(openedItemId);
+  }
+};
+
+// Менеджер тегов
 if (tagsSearchInput) {
   tagsSearchInput.oninput = (e) => {
     tagSearchFilterQuery = e.target.value.toLowerCase().trim();
@@ -1177,6 +1464,7 @@ editTagForm.onsubmit = async (e) => {
     renderTagsTable();
     populateTagFilterSelect();
     renderCatalog();
+    if (viewStats.classList.contains('active')) renderStats();
     if (openedItemId) openDetailPage(openedItemId);
   } catch (err) {
     alert('Не удалось изменить тег или такое имя уже существует.');
@@ -1190,9 +1478,324 @@ window.deleteTag = async (id) => {
     renderTagsTable();
     populateTagFilterSelect();
     renderCatalog();
+    if (viewStats.classList.contains('active')) renderStats();
     if (openedItemId) openDetailPage(openedItemId);
   }
 };
+
+// Раздел статистики и аналитики
+if (statsTypeFilter) {
+  statsTypeFilter.onchange = (e) => {
+    statsCurrentMediaType = e.target.value;
+    renderStats();
+  };
+}
+
+function renderStats() {
+  const items = (statsCurrentMediaType === 'all')
+    ? allItems
+    : allItems.filter(i => i.media_type === statsCurrentMediaType);
+
+  const total = items.length;
+  const planned = items.filter(i => i.status === 'Запланировано').length;
+  const inProgress = items.filter(i => i.status === 'В процессе').length;
+  const completed = items.filter(i => i.status === 'Завершено').length;
+  const dropped = items.filter(i => i.status === 'Брошено').length;
+
+  const completionRate = total > 0 ? ((completed / total) * 100).toFixed(1).replace('.0', '') : '0';
+  const ratedItems = items.filter(i => i.rating && i.rating > 0);
+  const avgScore = ratedItems.length > 0
+    ? (ratedItems.reduce((acc, it) => acc + it.rating, 0) / ratedItems.length / 2).toFixed(1).replace('.0', '')
+    : '—';
+  const favorites = items.filter(i => i.is_favorite === 1).length;
+  const favRate = total > 0 ? ((favorites / total) * 100).toFixed(0) : '0';
+
+  // KPI метрики
+  const kpiTotal = document.getElementById('stats-kpi-total');
+  const kpiTotalSub = document.getElementById('stats-kpi-total-sub');
+  const kpiProgress = document.getElementById('stats-kpi-progress');
+  const kpiProgressSub = document.getElementById('stats-kpi-progress-sub');
+  const kpiCompleted = document.getElementById('stats-kpi-completed');
+  const kpiCompletedSub = document.getElementById('stats-kpi-completed-sub');
+  const kpiPlanned = document.getElementById('stats-kpi-planned');
+  const kpiPlannedSub = document.getElementById('stats-kpi-planned-sub');
+  const kpiDropped = document.getElementById('stats-kpi-dropped');
+  const kpiDroppedSub = document.getElementById('stats-kpi-dropped-sub');
+  const kpiRating = document.getElementById('stats-kpi-rating');
+  const kpiRatingSub = document.getElementById('stats-kpi-rating-sub');
+  const kpiFav = document.getElementById('stats-kpi-fav');
+  const kpiFavSub = document.getElementById('stats-kpi-fav-sub');
+
+  if (kpiTotal) kpiTotal.textContent = total;
+  if (kpiTotalSub) {
+    kpiTotalSub.textContent = statsCurrentMediaType === 'all'
+      ? 'всей коллекции'
+      : `в категории «${mediaLabels[statsCurrentMediaType] || statsCurrentMediaType}»`;
+  }
+
+  if (kpiProgress) kpiProgress.textContent = inProgress;
+  if (kpiProgressSub) kpiProgressSub.textContent = `${total > 0 ? ((inProgress / total) * 100).toFixed(0) : 0}% от общего`;
+
+  if (kpiCompleted) kpiCompleted.textContent = completed;
+  if (kpiCompletedSub) kpiCompletedSub.textContent = `${completionRate}% выполнено`;
+
+  if (kpiPlanned) kpiPlanned.textContent = planned;
+  if (kpiPlannedSub) kpiPlannedSub.textContent = `${total > 0 ? ((planned / total) * 100).toFixed(0) : 0}% в планах`;
+
+  if (kpiDropped) kpiDropped.textContent = dropped;
+  if (kpiDroppedSub) kpiDroppedSub.textContent = `${total > 0 ? ((dropped / total) * 100).toFixed(0) : 0}% от общего`;
+
+  if (kpiRating) kpiRating.textContent = avgScore !== '—' ? `${avgScore} / 5` : '—';
+  if (kpiRatingSub) kpiRatingSub.textContent = `${ratedItems.length} из ${total} с оценкой`;
+
+  if (kpiFav) kpiFav.textContent = favorites;
+  if (kpiFavSub) kpiFavSub.textContent = `${favRate}% в избранном`;
+
+  // 1. Статусы: Стековый прогресс-бар и легенда
+  const statusBarEl = document.getElementById('stats-status-bar');
+  const statusLegendEl = document.getElementById('stats-status-legend');
+  if (statusBarEl && statusLegendEl) {
+    if (total === 0) {
+      statusBarEl.innerHTML = '<div class="stacked-bar-seg empty-seg" style="width: 100%;"></div>';
+      statusLegendEl.innerHTML = '<span class="empty-muted-label">Нет данных для отображения</span>';
+    } else {
+      const compPct = (completed / total) * 100;
+      const progPct = (inProgress / total) * 100;
+      const planPct = (planned / total) * 100;
+      const dropPct = (dropped / total) * 100;
+
+      statusBarEl.innerHTML = `
+        <div class="stacked-bar-seg seg-completed" style="width: ${compPct}%;" title="Завершено: ${completed}"></div>
+        <div class="stacked-bar-seg seg-progress" style="width: ${progPct}%;" title="В процессе: ${inProgress}"></div>
+        <div class="stacked-bar-seg seg-planned" style="width: ${planPct}%;" title="Запланировано: ${planned}"></div>
+        <div class="stacked-bar-seg seg-dropped" style="width: ${dropPct}%;" title="Брошено: ${dropped}"></div>
+      `;
+
+      statusLegendEl.innerHTML = `
+        <div class="legend-item">
+          <div class="legend-dot seg-completed"></div>
+          <span class="legend-name">Завершено</span>
+          <span class="legend-count">${completed} <small>(${compPct.toFixed(0)}%)</small></span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot seg-progress"></div>
+          <span class="legend-name">В процессе</span>
+          <span class="legend-count">${inProgress} <small>(${progPct.toFixed(0)}%)</small></span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot seg-planned"></div>
+          <span class="legend-name">Запланировано</span>
+          <span class="legend-count">${planned} <small>(${planPct.toFixed(0)}%)</small></span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot seg-dropped"></div>
+          <span class="legend-name">Брошено</span>
+          <span class="legend-count">${dropped} <small>(${dropPct.toFixed(0)}%)</small></span>
+        </div>
+      `;
+    }
+  }
+
+  // 2. Распределение по типам медиа
+  const typesListEl = document.getElementById('stats-types-list');
+  if (typesListEl) {
+    const typeKeys = ['game', 'movie', 'series', 'anime', 'book', 'comics', 'manga'];
+    const maxTypeCount = Math.max(1, ...typeKeys.map(t => allItems.filter(it => it.media_type === t).length));
+
+    typesListEl.innerHTML = '';
+    typeKeys.forEach(tKey => {
+      const count = (statsCurrentMediaType === 'all' || statsCurrentMediaType === tKey)
+        ? items.filter(it => it.media_type === tKey).length
+        : 0;
+      const pctOfMax = total > 0 ? (count / maxTypeCount) * 100 : 0;
+      const pctOfTotal = total > 0 ? ((count / total) * 100).toFixed(0) : 0;
+
+      const row = document.createElement('div');
+      row.className = `stats-bar-row ${count > 0 ? 'interactive' : ''}`;
+      if (count > 0) {
+        row.onclick = () => {
+          const typeBtn = document.querySelector(`#media-types-filter .nav-item[data-type="${tKey}"]`);
+          if (typeBtn) typeBtn.click();
+          switchView('catalog');
+        };
+      }
+
+      row.innerHTML = `
+        <div class="stats-bar-info">
+          <div class="stats-bar-icon-wrap">${typeIcons[tKey] || ''}</div>
+          <span class="stats-bar-label">${mediaLabels[tKey] || tKey}</span>
+          <span class="stats-bar-count">${count} <small>(${pctOfTotal}%)</small></span>
+        </div>
+        <div class="stats-bar-track">
+          <div class="stats-bar-fill type-fill-${tKey}" style="width: ${pctOfMax}%;"></div>
+        </div>
+      `;
+      typesListEl.appendChild(row);
+    });
+  }
+
+  // 3. Распределение оценок (Гистограмма 1 - 5 звёзд)
+  const ratingHistoEl = document.getElementById('stats-rating-histogram');
+  if (ratingHistoEl) {
+    const starBuckets = [
+      { stars: 5, label: '5 ★', count: items.filter(it => it.rating === 9 || it.rating === 10).length },
+      { stars: 4, label: '4 ★', count: items.filter(it => it.rating === 7 || it.rating === 8).length },
+      { stars: 3, label: '3 ★', count: items.filter(it => it.rating === 5 || it.rating === 6).length },
+      { stars: 2, label: '2 ★', count: items.filter(it => it.rating === 3 || it.rating === 4).length },
+      { stars: 1, label: '1 ★', count: items.filter(it => it.rating === 1 || it.rating === 2).length }
+    ];
+    const maxBucketCount = Math.max(1, ...starBuckets.map(b => b.count));
+
+    ratingHistoEl.innerHTML = '';
+    starBuckets.forEach(b => {
+      const col = document.createElement('div');
+      col.className = 'histogram-col';
+
+      const heightPct = b.count > 0 ? Math.max(14, (b.count / maxBucketCount) * 100) : 6;
+      col.innerHTML = `
+        <div class="histogram-count-val">${b.count}</div>
+        <div class="histogram-bar-track">
+          <div class="histogram-bar-fill" style="height: ${heightPct}%;"></div>
+        </div>
+        <div class="histogram-star-label">${b.label}</div>
+      `;
+      ratingHistoEl.appendChild(col);
+    });
+  }
+
+  // 4. Топ жанров
+  const genresListEl = document.getElementById('stats-genres-list');
+  if (genresListEl) {
+    const genreCounts = {};
+    items.forEach(it => {
+      if (it.genres) {
+        try {
+          const arr = JSON.parse(it.genres);
+          arr.forEach(g => {
+            genreCounts[g] = (genreCounts[g] || 0) + 1;
+          });
+        } catch (e) {}
+      }
+    });
+
+    const sortedGenres = Object.entries(genreCounts).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    genresListEl.innerHTML = '';
+    if (sortedGenres.length === 0) {
+      genresListEl.innerHTML = '<span class="empty-muted-label">Жанры в этой категории пока не добавлены</span>';
+    } else {
+      const maxGCount = sortedGenres[0][1];
+      sortedGenres.forEach(([gName, gCount], idx) => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'stats-rank-item';
+        itemEl.onclick = () => {
+          setGenreFilter(gName);
+        };
+        const widthPct = Math.max(8, (gCount / maxGCount) * 100);
+        itemEl.innerHTML = `
+          <div class="rank-badge">${idx + 1}</div>
+          <div class="rank-name-col">
+            <div class="rank-name-row">
+              <span class="rank-title">${gName}</span>
+              <span class="rank-count-pill">${gCount}</span>
+            </div>
+            <div class="rank-bar-track">
+              <div class="rank-bar-fill genre-rank-fill" style="width: ${widthPct}%;"></div>
+            </div>
+          </div>
+        `;
+        genresListEl.appendChild(itemEl);
+      });
+    }
+  }
+
+  // 5. Топ тегов
+  const tagsListEl = document.getElementById('stats-tags-list');
+  if (tagsListEl) {
+    const tagCounts = {};
+    items.forEach(it => {
+      if (it.tags) {
+        try {
+          const arr = JSON.parse(it.tags);
+          arr.forEach(t => {
+            tagCounts[t] = (tagCounts[t] || 0) + 1;
+          });
+        } catch (e) {}
+      }
+    });
+
+    const sortedTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    tagsListEl.innerHTML = '';
+    if (sortedTags.length === 0) {
+      tagsListEl.innerHTML = '<span class="empty-muted-label">Теги в этой категории пока не добавлены</span>';
+    } else {
+      const maxTCount = sortedTags[0][1];
+      sortedTags.forEach(([tName, tCount], idx) => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'stats-rank-item';
+        itemEl.onclick = () => {
+          setTagFilter(tName);
+        };
+        const widthPct = Math.max(8, (tCount / maxTCount) * 100);
+        itemEl.innerHTML = `
+          <div class="rank-badge">${idx + 1}</div>
+          <div class="rank-name-col">
+            <div class="rank-name-row">
+              <span class="rank-title">${tName}</span>
+              <span class="rank-count-pill">${tCount}</span>
+            </div>
+            <div class="rank-bar-track">
+              <div class="rank-bar-fill tag-rank-fill" style="width: ${widthPct}%;"></div>
+            </div>
+          </div>
+        `;
+        tagsListEl.appendChild(itemEl);
+      });
+    }
+  }
+
+  // 6. Топ высоко оцененных медиа
+  const topMediaEl = document.getElementById('stats-top-rated-list');
+  if (topMediaEl) {
+    const topRated = [...items]
+      .filter(it => it.rating && it.rating > 0)
+      .sort((a, b) => b.rating - a.rating || (b.is_favorite || 0) - (a.is_favorite || 0) || b.id - a.id)
+      .slice(0, 5);
+
+    topMediaEl.innerHTML = '';
+    if (topRated.length === 0) {
+      topMediaEl.innerHTML = '<span class="empty-muted-label">В этой категории пока нет оцененных записей</span>';
+    } else {
+      topRated.forEach(it => {
+        const miniCard = document.createElement('div');
+        miniCard.className = 'stats-media-mini-card';
+        miniCard.onclick = () => openDetailPage(it.id);
+
+        let coverImgHtml;
+        if (it.cover_path) {
+          coverImgHtml = `<img src="file:///${it.cover_path.replace(/\\/g, '/')}" class="stats-mini-cover" onerror="this.src=''"/>`;
+        } else {
+          coverImgHtml = `<div class="stats-mini-cover stats-mini-cover-empty"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
+        }
+
+        miniCard.innerHTML = `
+          ${coverImgHtml}
+          <div class="stats-mini-info">
+            <div class="stats-mini-title">${it.title}</div>
+            <div class="stats-mini-meta">
+              <span class="badge ${getStatusClass(it.status || 'Запланировано')}">${it.status || 'Запланировано'}</span>
+              <span class="type-badge-row">${typeIcons[it.media_type] || ''}<span>${mediaLabels[it.media_type] || it.media_type}</span></span>
+            </div>
+          </div>
+          <div class="stats-mini-score">
+            <svg viewBox="0 0 24 24" fill="#f59e0b"><path d="${STAR_PATH}"/></svg>
+            <span>${(it.rating / 2).toFixed(1).replace('.0', '')}</span>
+          </div>
+        `;
+        topMediaEl.appendChild(miniCard);
+      });
+    }
+  }
+}
 
 document.querySelectorAll('#media-types-filter .nav-item').forEach(btn => {
   btn.onclick = () => {
@@ -1200,6 +1803,7 @@ document.querySelectorAll('#media-types-filter .nav-item').forEach(btn => {
     btn.classList.add('active');
     currentFilterType = btn.dataset.type;
     if (viewDetail.classList.contains('active')) closeDetailPage();
+    if (!viewCatalog.classList.contains('active')) switchView('catalog');
     renderCatalog();
   };
 });
@@ -1208,6 +1812,7 @@ favFilterBtn.onclick = () => {
   filterOnlyFavorites = !filterOnlyFavorites;
   favFilterBtn.classList.toggle('active', filterOnlyFavorites);
   if (viewDetail.classList.contains('active')) closeDetailPage();
+  if (!viewCatalog.classList.contains('active')) switchView('catalog');
   renderCatalog();
 };
 
@@ -1216,6 +1821,7 @@ searchInput.oninput = (e) => {
   searchDebounceTimer = setTimeout(() => {
     searchQuery = e.target.value.toLowerCase().trim();
     if (viewDetail.classList.contains('active')) closeDetailPage();
+    if (!viewCatalog.classList.contains('active')) switchView('catalog');
     renderCatalog();
   }, 150);
 };
@@ -1243,6 +1849,7 @@ window.setTagFilter = (tag) => {
     tagFilterSelect.value = tag;
   }
   if (viewDetail.classList.contains('active')) closeDetailPage();
+  if (!viewCatalog.classList.contains('active')) switchView('catalog');
   renderCatalog();
 };
 
@@ -1273,6 +1880,10 @@ function handleNavigateBack() {
     closeEditTagModal();
     return;
   }
+  if (editGenreModal && !editGenreModal.classList.contains('hidden')) {
+    closeEditGenreModal();
+    return;
+  }
 
   // 2. Возврат из карточки просмотра в каталог
   if (viewDetail.classList.contains('active')) {
@@ -1280,19 +1891,25 @@ function handleNavigateBack() {
     return;
   }
 
-  // 3. Возврат из раздела управления тегами в каталог
-  if (viewTags.classList.contains('active')) {
+  // 3. Возврат из других разделов (статистика, жанры, теги) в каталог
+  if (viewStats.classList.contains('active') || viewGenres.classList.contains('active') || viewTags.classList.contains('active')) {
     tabCatalogBtn.click();
     return;
   }
 
-  // 4. Сброс фильтра по тегу в каталоге
+  // 4. Сброс фильтра по жанру в каталоге
+  if (activeGenre) {
+    window.clearGenreFilter();
+    return;
+  }
+
+  // 5. Сброс фильтра по тегу в каталоге
   if (activeTag) {
     window.clearTagFilter();
     return;
   }
 
-  // 5. Сброс фильтра по подборке
+  // 6. Сброс фильтра по подборке
   if (currentCollectionFilter !== null) {
     currentCollectionFilter = null;
     renderCollectionsSidebar();
@@ -1300,13 +1917,13 @@ function handleNavigateBack() {
     return;
   }
 
-  // 6. Сброс фильтра избранного
+  // 7. Сброс фильтра избранного
   if (filterOnlyFavorites) {
     favFilterBtn.click();
     return;
   }
 
-  // 7. Сброс типа медиа в «Все»
+  // 8. Сброс типа медиа в «Все»
   if (currentFilterType !== 'all') {
     const allBtn = document.querySelector('#media-types-filter .nav-item[data-type="all"]');
     if (allBtn) allBtn.click();

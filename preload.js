@@ -13,6 +13,11 @@ contextBridge.exposeInMainWorld('api', {
   updateTag: (tag) => ipcRenderer.invoke('update-tag', tag),
   deleteTag: (id) => ipcRenderer.invoke('delete-tag', id),
 
+  getGenres: () => ipcRenderer.invoke('get-genres'),
+  createGenre: (genre) => ipcRenderer.invoke('create-genre', genre),
+  updateGenre: (genre) => ipcRenderer.invoke('update-genre', genre),
+  deleteGenre: (id) => ipcRenderer.invoke('delete-genre', id),
+
   getCollections: () => ipcRenderer.invoke('get-collections'),
   createCollection: (name) => ipcRenderer.invoke('create-collection', name),
   deleteCollection: (id) => ipcRenderer.invoke('delete-collection', id),
